@@ -22,6 +22,7 @@
         <button onclick="showScreen('neopixel')">Neopixel</button>
         <button onclick="showScreen('string')">String</button>
         <button onclick="showScreen('raw')">Raw Data</button>
+        <button onclick="showScreen('location')">Location</button>
     </div>
 
     <!-- Color Picker Screen -->
@@ -61,6 +62,7 @@
     <!-- DFU Screen -->
     <div id="dfu" class="screen">
         <h1>DFU</h1>
+        <input type="file" id="dfuFileInput">
         <button onclick="sendDFUPacket()">Send DFU Packet</button>
         <button onclick="showScreen('main-menu')">Back</button>
     </div>
@@ -68,6 +70,7 @@
     <!-- Security Screen -->
     <div id="security" class="screen">
         <h1>Security</h1>
+        <input type="text" id="securityInput" placeholder="Enter security data">
         <button onclick="sendSecurityPacket()">Send Security Packet</button>
         <button onclick="showScreen('main-menu')">Back</button>
     </div>
@@ -75,7 +78,9 @@
     <!-- Read/Write Screen -->
     <div id="read-write" class="screen">
         <h1>Read/Write</h1>
+        <input type="text" id="readInput" placeholder="Enter data to read">
         <button onclick="sendReadPacket()">Read</button>
+        <input type="text" id="writeInput" placeholder="Enter data to write">
         <button onclick="sendWritePacket()">Write</button>
         <button onclick="showScreen('main-menu')">Back</button>
     </div>
@@ -83,6 +88,7 @@
     <!-- Notify Screen -->
     <div id="notify" class="screen">
         <h1>Notify</h1>
+        <input type="text" id="notifyInput" placeholder="Enter notify data">
         <button onclick="sendNotifyPacket()">Send Notify Packet</button>
         <button onclick="showScreen('main-menu')">Back</button>
     </div>
@@ -97,6 +103,7 @@
     <!-- IO Pin Screen -->
     <div id="iopin" class="screen">
         <h1>IO Pin</h1>
+        <input type="text" id="ioPinInput" placeholder="Enter IO Pin data">
         <button onclick="sendIOPinPacket()">Send IO Pin Packet</button>
         <button onclick="showScreen('main-menu')">Back</button>
     </div>
@@ -104,6 +111,7 @@
     <!-- Neopixel Screen -->
     <div id="neopixel" class="screen">
         <h1>Neopixel</h1>
+        <input type="text" id="neopixelInput" placeholder="Enter Neopixel data">
         <button onclick="sendNeopixelPacket()">Send Neopixel Packet</button>
         <button onclick="showScreen('main-menu')">Back</button>
     </div>
@@ -111,6 +119,7 @@
     <!-- String Screen -->
     <div id="string" class="screen">
         <h1>String</h1>
+        <input type="text" id="stringInput" placeholder="Enter string">
         <button onclick="sendStringPacket()">Send String Packet</button>
         <button onclick="showScreen('main-menu')">Back</button>
     </div>
@@ -118,7 +127,20 @@
     <!-- Raw Data Screen -->
     <div id="raw" class="screen">
         <h1>Raw Data</h1>
-        <button onclick="sendRawPacket()">Send Raw Packet</button>
+        <input type="text" id="rawBytesInput" placeholder="Enter raw bytes (comma-separated)">
+        <button onclick="sendRawBytes()">Send Raw Bytes</button>
+        <input type="text" id="rawStringInput" placeholder="Enter raw string">
+        <button onclick="sendRawString()">Send Raw String</button>
+        <button onclick="showScreen('main-menu')">Back</button>
+    </div>
+
+    <!-- Location Screen -->
+    <div id="location" class="screen">
+        <h1>Location</h1>
+        <input type="text" id="latitudeInput" placeholder="Enter latitude">
+        <input type="text" id="longitudeInput" placeholder="Enter longitude">
+        <button onclick="sendLocation()">Send Location</button>
+        <button onclick="getCurrentLocation()">Use Current Location</button>
         <button onclick="showScreen('main-menu')">Back</button>
     </div>
 

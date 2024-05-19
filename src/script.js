@@ -298,70 +298,108 @@ function sendATCommand() {
 
 // Send DFU packet
 function sendDFUPacket() {
-    const payload = new Uint8Array([/* your DFU data here */]);
-    const dfuPacket = new DFUPacket(payload);
-    sendPacket(dfuPacket);
+    const fileInput = document.getElementById("dfuFileInput");
+    const file = fileInput.files[0];
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const arrayBuffer = e.target.result;
+        const dfuPacket = new DFUPacket(new Uint8Array(arrayBuffer));
+        sendPacket(dfuPacket);
+    };
+    reader.readAsArrayBuffer(file);
 }
 
 // Send Security packet
 function sendSecurityPacket() {
-    const payload = new Uint8Array([/* your Security data here */]);
+    const securityData = document.getElementById("securityInput").value;
+    const payload = Array.from(new TextEncoder().encode(securityData));
     const securityPacket = new SecurityPacket(payload);
     sendPacket(securityPacket);
 }
 
 // Send Read packet
 function sendReadPacket() {
-    const payload = new Uint8Array([/* your Read data here */]);
+    const readData = document.getElementById("readInput").value;
+    const payload = Array.from(new TextEncoder().encode(readData));
     const readPacket = new ReadPacket(payload);
     sendPacket(readPacket);
 }
 
 // Send Write packet
 function sendWritePacket() {
-    const payload = new Uint8Array([/* your Write data here */]);
+    const writeData = document.getElementById("writeInput").value;
+    const payload = Array.from(new TextEncoder().encode(writeData));
     const writePacket = new WritePacket(payload);
     sendPacket(writePacket);
 }
 
 // Send Notify packet
 function sendNotifyPacket() {
-    const payload = new Uint8Array([/* your Notify data here */]);
+    const notifyData = document.getElementById("notifyInput").value;
+    const payload = Array.from(new TextEncoder().encode(notifyData));
     const notifyPacket = new NotifyPacket(payload);
     sendPacket(notifyPacket);
 }
 
 // Send Scan packet
 function sendScanPacket() {
-    const payload = new Uint8Array([/* your Scan data here */]);
-    const scanPacket = new ScanPacket(payload);
+    const scanPacket = new ScanPacket(new Uint8Array([]));
     sendPacket(scanPacket);
 }
 
 // Send IO Pin packet
 function sendIOPinPacket() {
-    const payload = new Uint8Array([/* your IO Pin data here */]);
+    const ioPinData = document.getElementById("ioPinInput").value;
+    const payload = Array.from(new TextEncoder().encode(ioPinData));
     const ioPinPacket = new IOPinPacket(payload);
     sendPacket(ioPinPacket);
 }
 
 // Send Neopixel packet
 function sendNeopixelPacket() {
-    const payload = new Uint8Array([/* your Neopixel data here */]);
+    const neopixelData = document.getElementById("neopixelInput").value;
+    const payload = Array.from(new TextEncoder().encode(neopixelData));
     const neopixelPacket = new NeopixelPacket(payload);
     sendPacket(neopixelPacket);
 }
 
 // Send String packet
 function sendStringPacket() {
-    const payload = "Your string data here";
-    const stringPacket = new StringPacket(payload);
+    const stringData = document.getElementById("stringInput").value;
+    const stringPacket = new StringPacket(stringData);
     sendPacket(stringPacket);
 }
 
-// Send Raw data packet
-function sendRawPacket() {
-    const payload = new Uint8Array([/* your Raw data here */]);
-    const rawPacket = new RawPacket(payload);
+// Send Raw Bytes packet
+function sendRawBytes() {
+    const rawBytesInput = document.getElementById("rawBytesInput").value;
+    const rawBytes = rawBytesInput.split(',').map(byte => parseInt(byte.trim(), 10));
+    const rawPacket = new RawPacket(rawBytes);
     sendPacket(rawPacket);
+}
+
+// Send Raw String packet
+function sendRawString() {
+    const rawStringInput = document.getElementById("rawStringInput").value;
+    const stringPacket = new StringPacket(rawStringInput);
+    sendPacket(stringPacket);
+}
+
+// Send location
+function sendLocation() {
+    const latitude = parseFloat(document.getElementById("latitudeInput").value);
+    const longitude = parseFloat(document.getElementById("longitudeInput").value);
+    const locationPacket = new LocationPacket(latitude, longitude);
+    sendPacket(locationPacket);
+}
+
+// Use current location
+function getCurrentLocation() {
+    navigator.geolocation.getCurrentPosition((position) => {
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
+        document.getElementById("latitudeInput").value = latitude;
+        document.getElementById("longitudeInput").value = longitude;
+        sendLocation();
+    });
 }

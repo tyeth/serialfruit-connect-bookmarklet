@@ -157,6 +157,77 @@ class MagnetometerPacket extends BluefruitPacket {
     }
 }
 
+// DFU Packet class
+class DFUPacket extends BluefruitPacket {
+    constructor(payload) {
+        super(PacketType.DFU, payload);
+    }
+}
+
+// Security Packet class
+class SecurityPacket extends BluefruitPacket {
+    constructor(payload) {
+        super(PacketType.SECURITY, payload);
+    }
+}
+
+// Read Packet class
+class ReadPacket extends BluefruitPacket {
+    constructor(payload) {
+        super(PacketType.READ, payload);
+    }
+}
+
+// Write Packet class
+class WritePacket extends BluefruitPacket {
+    constructor(payload) {
+        super(PacketType.WRITE, payload);
+    }
+}
+
+// Notify Packet class
+class NotifyPacket extends BluefruitPacket {
+    constructor(payload) {
+        super(PacketType.NOTIFY, payload);
+    }
+}
+
+// Scan Packet class
+class ScanPacket extends BluefruitPacket {
+    constructor(payload) {
+        super(PacketType.SCAN, payload);
+    }
+}
+
+// IO Pin Packet class
+class IOPinPacket extends BluefruitPacket {
+    constructor(payload) {
+        super(PacketType.IOPIN, payload);
+    }
+}
+
+// Neopixel Packet class
+class NeopixelPacket extends BluefruitPacket {
+    constructor(payload) {
+        super(PacketType.NEOPIXEL, payload);
+    }
+}
+
+// String Packet class
+class StringPacket extends BluefruitPacket {
+    constructor(payload) {
+        const payloadArray = Array.from(new TextEncoder().encode(payload));
+        super(PacketType.STRING, payloadArray);
+    }
+}
+
+// Raw Data Packet class
+class RawPacket extends BluefruitPacket {
+    constructor(payload) {
+        super(PacketType.RAW, payload);
+    }
+}
+
 // Initialize global variables for serial port and writer
 let port, writer, accelerometerEnabled = false;
 
@@ -223,4 +294,74 @@ function sendATCommand() {
     const command = document.getElementById("commandInput").value;
     const atCommandPacket = new ATCommandPacket(command);
     sendPacket(atCommandPacket);
+}
+
+// Send DFU packet
+function sendDFUPacket() {
+    const payload = new Uint8Array([/* your DFU data here */]);
+    const dfuPacket = new DFUPacket(payload);
+    sendPacket(dfuPacket);
+}
+
+// Send Security packet
+function sendSecurityPacket() {
+    const payload = new Uint8Array([/* your Security data here */]);
+    const securityPacket = new SecurityPacket(payload);
+    sendPacket(securityPacket);
+}
+
+// Send Read packet
+function sendReadPacket() {
+    const payload = new Uint8Array([/* your Read data here */]);
+    const readPacket = new ReadPacket(payload);
+    sendPacket(readPacket);
+}
+
+// Send Write packet
+function sendWritePacket() {
+    const payload = new Uint8Array([/* your Write data here */]);
+    const writePacket = new WritePacket(payload);
+    sendPacket(writePacket);
+}
+
+// Send Notify packet
+function sendNotifyPacket() {
+    const payload = new Uint8Array([/* your Notify data here */]);
+    const notifyPacket = new NotifyPacket(payload);
+    sendPacket(notifyPacket);
+}
+
+// Send Scan packet
+function sendScanPacket() {
+    const payload = new Uint8Array([/* your Scan data here */]);
+    const scanPacket = new ScanPacket(payload);
+    sendPacket(scanPacket);
+}
+
+// Send IO Pin packet
+function sendIOPinPacket() {
+    const payload = new Uint8Array([/* your IO Pin data here */]);
+    const ioPinPacket = new IOPinPacket(payload);
+    sendPacket(ioPinPacket);
+}
+
+// Send Neopixel packet
+function sendNeopixelPacket() {
+    const payload = new Uint8Array([/* your Neopixel data here */]);
+    const neopixelPacket = new NeopixelPacket(payload);
+    sendPacket(neopixelPacket);
+}
+
+// Send String packet
+function sendStringPacket() {
+    const payload = "Your string data here";
+    const stringPacket = new StringPacket(payload);
+    sendPacket(stringPacket);
+}
+
+// Send Raw data packet
+function sendRawPacket() {
+    const payload = new Uint8Array([/* your Raw data here */]);
+    const rawPacket = new RawPacket(payload);
+    sendPacket(rawPacket);
 }

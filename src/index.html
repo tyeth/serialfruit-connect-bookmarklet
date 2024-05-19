@@ -13,8 +13,18 @@
         <button onclick="showScreen('control-pad')">Control Pad</button>
         <button onclick="showScreen('accelerometer')">Accelerometer</button>
         <button onclick="showScreen('terminal')">Terminal</button>
+        <button onclick="showScreen('dfu')">DFU</button>
+        <button onclick="showScreen('security')">Security</button>
+        <button onclick="showScreen('read-write')">Read/Write</button>
+        <button onclick="showScreen('notify')">Notify</button>
+        <button onclick="showScreen('scan')">Scan</button>
+        <button onclick="showScreen('iopin')">IO Pin</button>
+        <button onclick="showScreen('neopixel')">Neopixel</button>
+        <button onclick="showScreen('string')">String</button>
+        <button onclick="showScreen('raw')">Raw Data</button>
     </div>
 
+    <!-- Color Picker Screen -->
     <div id="color-picker" class="screen">
         <h1>Color Picker</h1>
         <input type="color" id="colorInput">
@@ -22,6 +32,7 @@
         <button onclick="showScreen('main-menu')">Back</button>
     </div>
 
+    <!-- Control Pad Screen -->
     <div id="control-pad" class="screen">
         <h1>Control Pad</h1>
         <button onclick="sendControlCommand(1)">Up</button>
@@ -31,18 +42,84 @@
         <button onclick="showScreen('main-menu')">Back</button>
     </div>
 
+    <!-- Accelerometer Screen -->
     <div id="accelerometer" class="screen">
         <h1>Accelerometer</h1>
         <button onclick="toggleAccelerometer()">Start/Stop Sending Data</button>
         <button onclick="showScreen('main-menu')">Back</button>
     </div>
 
+    <!-- Terminal Screen -->
     <div id="terminal" class="screen">
         <h1>Terminal</h1>
         <input type="text" id="commandInput" placeholder="Enter command">
         <button onclick="sendATCommand()">Send Command</button>
         <button onclick="showScreen('main-menu')">Back</button>
         <pre id="terminalOutput"></pre>
+    </div>
+
+    <!-- DFU Screen -->
+    <div id="dfu" class="screen">
+        <h1>DFU</h1>
+        <button onclick="sendDFUPacket()">Send DFU Packet</button>
+        <button onclick="showScreen('main-menu')">Back</button>
+    </div>
+
+    <!-- Security Screen -->
+    <div id="security" class="screen">
+        <h1>Security</h1>
+        <button onclick="sendSecurityPacket()">Send Security Packet</button>
+        <button onclick="showScreen('main-menu')">Back</button>
+    </div>
+
+    <!-- Read/Write Screen -->
+    <div id="read-write" class="screen">
+        <h1>Read/Write</h1>
+        <button onclick="sendReadPacket()">Read</button>
+        <button onclick="sendWritePacket()">Write</button>
+        <button onclick="showScreen('main-menu')">Back</button>
+    </div>
+
+    <!-- Notify Screen -->
+    <div id="notify" class="screen">
+        <h1>Notify</h1>
+        <button onclick="sendNotifyPacket()">Send Notify Packet</button>
+        <button onclick="showScreen('main-menu')">Back</button>
+    </div>
+
+    <!-- Scan Screen -->
+    <div id="scan" class="screen">
+        <h1>Scan</h1>
+        <button onclick="sendScanPacket()">Send Scan Packet</button>
+        <button onclick="showScreen('main-menu')">Back</button>
+    </div>
+
+    <!-- IO Pin Screen -->
+    <div id="iopin" class="screen">
+        <h1>IO Pin</h1>
+        <button onclick="sendIOPinPacket()">Send IO Pin Packet</button>
+        <button onclick="showScreen('main-menu')">Back</button>
+    </div>
+
+    <!-- Neopixel Screen -->
+    <div id="neopixel" class="screen">
+        <h1>Neopixel</h1>
+        <button onclick="sendNeopixelPacket()">Send Neopixel Packet</button>
+        <button onclick="showScreen('main-menu')">Back</button>
+    </div>
+
+    <!-- String Screen -->
+    <div id="string" class="screen">
+        <h1>String</h1>
+        <button onclick="sendStringPacket()">Send String Packet</button>
+        <button onclick="showScreen('main-menu')">Back</button>
+    </div>
+
+    <!-- Raw Data Screen -->
+    <div id="raw" class="screen">
+        <h1>Raw Data</h1>
+        <button onclick="sendRawPacket()">Send Raw Packet</button>
+        <button onclick="showScreen('main-menu')">Back</button>
     </div>
 
     <script src="script.js"></script>

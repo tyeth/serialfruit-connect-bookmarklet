@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bluefruit Web Serial</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="main-menu" class="screen">
+        <h1>Bluefruit Web Serial</h1>
+        <button onclick="showScreen('color-picker')">Color Picker</button>
+        <button onclick="showScreen('control-pad')">Control Pad</button>
+        <button onclick="showScreen('accelerometer')">Accelerometer</button>
+        <button onclick="showScreen('terminal')">Terminal</button>
+    </div>
+
+    <div id="color-picker" class="screen">
+        <h1>Color Picker</h1>
+        <input type="color" id="colorInput">
+        <button onclick="sendColor()">Send Color</button>
+        <button onclick="showScreen('main-menu')">Back</button>
+    </div>
+
+    <div id="control-pad" class="screen">
+        <h1>Control Pad</h1>
+        <button onclick="sendControlCommand(1)">Up</button>
+        <button onclick="sendControlCommand(2)">Down</button>
+        <button onclick="sendControlCommand(3)">Left</button>
+        <button onclick="sendControlCommand(4)">Right</button>
+        <button onclick="showScreen('main-menu')">Back</button>
+    </div>
+
+    <div id="accelerometer" class="screen">
+        <h1>Accelerometer</h1>
+        <button onclick="toggleAccelerometer()">Start/Stop Sending Data</button>
+        <button onclick="showScreen('main-menu')">Back</button>
+    </div>
+
+    <div id="terminal" class="screen">
+        <h1>Terminal</h1>
+        <input type="text" id="commandInput" placeholder="Enter command">
+        <button onclick="sendATCommand()">Send Command</button>
+        <button onclick="showScreen('main-menu')">Back</button>
+        <pre id="terminalOutput"></pre>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

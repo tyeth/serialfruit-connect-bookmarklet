@@ -28,7 +28,7 @@
         panel.appendChild(toggleButton);
         
         // Add the content from your index.html to the panel
-        fetch("https://cdn.jsdelivr.net/gh/tyeth/serialfruit-connect@main/src/index.html")
+        fetch("https://cdn.jsdelivr.net/gh/tyeth/serialfruit-connect@285ae36905197097715d2547c9c0a48b0075e833/src/index.html")
             .then(response => response.text())
             .then(html => {
                 panel.innerHTML += html;

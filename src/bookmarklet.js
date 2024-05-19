@@ -2,12 +2,12 @@
     // Create a link element for CSS
     var link = document.createElement("link");
     link.rel = "stylesheet";
-    link.href = "https://cdn.jsdelivr.net/gh/tyeth/serialfruit-connect@main/src/style.css";
+    link.href = "https://cdn.jsdelivr.net/gh/tyeth/serialfruit-connect@285ae36905197097715d2547c9c0a48b0075e833/src/style.css";
     document.head.appendChild(link);
 
     // Create a script element for the JavaScript
     var script = document.createElement("script");
-    script.src = "https://cdn.jsdelivr.net/gh/tyeth/serialfruit-connect@main/src/script.js";
+    script.src = "https://cdn.jsdelivr.net/gh/tyeth/serialfruit-connect@285ae36905197097715d2547c9c0a48b0075e833/src/script.js";
     script.onload = function() {
         // Create the side panel
         var panel = document.createElement("div");

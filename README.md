@@ -35,6 +35,15 @@ This project is a web-based tool that allows you to send various types of data p
 
 See `./examples` folder for a Crickit based project that previously required bluetooth
 
+This is the bookmarklet code to copy and paste into address bar:
+```
+javascript:(function() {
+    var script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/gh/tyeth/serialfruit-connect@main/src/bookmarklet.js';
+    document.body.appendChild(script);
+})();
+```
+
 1. **Color Picker**:
     - Select a color using the color input.
     - Click "Send Color" to send the selected color data.

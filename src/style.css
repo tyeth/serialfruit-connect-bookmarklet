@@ -11,9 +11,13 @@ body.serialfruit-body {
 
 .serialfruit-body > .screen {
     display: none;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
     text-align: center;
+}
+
+.serialfruit-body > #main-menu.screen {
+    flex-direction: column;
 }
 
 .serialfruit-body > .screen h1 {

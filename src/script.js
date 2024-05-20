@@ -322,18 +322,39 @@ async function ensureAddressAndSocketAccess() {
                         cButton.click();
                         setTimeout(() => {
                             //button#web-workflow click
-                            console.log('Clicking button#web-workflow');
-                            let wButton = document.querySelector('button#web-workflow');
-                            if (wButton){
-                                let clickEvent = new MouseEvent('click', {
-                                    view: window,
+                            console.log('Triggering button#web-workflow with event');
+                            // first trigger focusIn on <div class="popup-modal shadow prompt closable is--visible" 
+                            // and on button#web-workflow
+                            let wModal = document.querySelector('div.popup-modal.is--visible[data-popup-modal="connection-type"]');
+                            if (wModal){
+                                let focusInEvent = new FocusEvent('focusin', {
+                                    view: wModal.ownerDocument.defaultView,
                                     bubbles: true,
-                                    cancelable: true
+                                    cancelable: false
                                 });
-                                wButton.dispatchEvent(clickEvent);
-                                console.log('Button#web-workflow click dispatched');
+                                wModal.dispatchEvent(focusInEvent);
+                                console.log('FocusIn event dispatched on modal');
+
+                                let wButton = document.querySelector('button#web-workflow');
+                                if (wButton){
+                                    let focusInEvent = new FocusEvent('focusin', {
+                                        view: wButton.ownerDocument.defaultView,
+                                        bubbles: true,
+                                        cancelable: false
+                                    });
+                                    wButton.dispatchEvent(focusInEvent);
+                                    let clickEvent = new MouseEvent('click', {
+                                        view: wButton.ownerDocument.defaultView,
+                                        bubbles: true,
+                                        cancelable: false
+                                    });
+                                    wButton.dispatchEvent(clickEvent);
+                                    console.log('Button#web-workflow click dispatched');
+                                } else {
+                                    console.error('Button#web-workflow not found - click manually');
+                                }
                             } else {
-                                console.error('Button#web-workflow not found - click manually');
+                                console.error('Modal not found - click manually');
                             }
                         }, 800);
                     }, 800);

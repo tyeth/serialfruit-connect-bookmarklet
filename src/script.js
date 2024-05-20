@@ -253,9 +253,54 @@ async function sendPacket(packet) {
             console.log('Packet sent:', packet.toArray());
             return;
         } else if (window.location.pathname == "/code/") {
-            // check if device connected state on page
+            // monkey patch websockets to allow reuse
+            const originalWebSocket = window.WebSocket;
+            const trackedSockets = [];
+    
+            function TrackingWebSocket(url, protocols) {
+                const ws = new originalWebSocket(url, protocols);
+                trackedSockets.push(ws);
+                console.log('WebSocket created:', ws);
+                return ws;
+            }
+    
+            TrackingWebSocket.prototype = originalWebSocket.prototype;
+            window.WebSocket = TrackingWebSocket;
+    
+            window.getTrackedSockets = function() {
+                return trackedSockets;
+            };
+    
+            console.log('WebSocket tracking enabled.');
+            
+            // check if device connected state on page and reconnect
+            const connectButton = document.querySelector('button.btn-connect');
+            if (connectButton) {
+                if (connectButton.textContent === 'Disconnect') {
+                    connectButton.click();
+                    setTimeout(() => {
+                        connectButton.click();
+                    }, 800);
+                } else {
+                    console.log('Device already disconnected, new socket will be caught');
+                }
+            } else {
+                console.error('Connect button not found');
+            }
 
-            // check if Serial panel is visible
+            // check if Serial panel (id serial-page) is visible or click button#btn-mode-serial
+            const serialPanel = document.getElementById('serial-page');
+            if (serialPanel) {
+                if (serialPanel.style.display === 'none') {
+                    setTimeout(() => {
+                        document.getElementById('btn-mode-serial').click();
+                    }, 1200);
+                } else {
+                    console.log('Serial panel already visible');
+                }
+            } else {
+                console.error('Serial panel not found');
+            }
 
             // check if Serial panel is connected
 

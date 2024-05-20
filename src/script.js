@@ -343,13 +343,26 @@ async function ensureAddressAndSocketAccess() {
                                         cancelable: false
                                     });
                                     wButton.dispatchEvent(focusInEvent);
-                                    let clickEvent = new MouseEvent('click', {
+                                    // use PointerEvent with target instead of MouseEvent
+                                    let clickEvent = new PointerEvent('click', {
                                         view: wButton.ownerDocument.defaultView,
                                         bubbles: true,
-                                        cancelable: false
+                                        cancelable: false,
+                                        pointerType: 'mouse',
+                                        button: 0,
+                                        buttons: 1,
+                                        isPrimary: true,
+                                        isTrusted: true,
+                                        target: wButton
                                     });
                                     wButton.dispatchEvent(clickEvent);
-                                    console.log('Button#web-workflow click dispatched');
+                                    // let clickEvent = new MouseEvent('click', {
+                                    //     view: wButton.ownerDocument.defaultView,
+                                    //     bubbles: true,
+                                    //     cancelable: false
+                                    // });
+                                    // wButton.dispatchEvent(clickEvent);
+                                    console.log('Button#web-workflow event dispatched');
                                 } else {
                                     console.error('Button#web-workflow not found - click manually');
                                 }

@@ -311,7 +311,8 @@ async function ensureAddressAndSocketAccess() {
             console.log('WebSocket tracking enabled.');
 
             // check if device connected state on page and reconnect
-            const connectButton = document.querySelector('button.btn-connect');
+            let connectButton = document.querySelector('button.btn-connect');
+            connectButton = hasAttr(connectButton,"length") && connectButton.length > 1 ? connectButton[0] : connectButton;
             if (connectButton) {
                 if (connectButton.textContent === 'Disconnect') {
                     console.log('Device already connected, disconnecting first');
@@ -319,6 +320,7 @@ async function ensureAddressAndSocketAccess() {
                     setTimeout(() => {
                         console.log('Reconnecting device');
                         let cButton = document.querySelector('button.btn-connect');
+                        cButton = hasAttr(cButton,"length") && cButton.length > 1 ? cButton[0] : cButton;
                         cButton.click();
                         setTimeout(() => {
                             //button#web-workflow click
@@ -334,7 +336,7 @@ async function ensureAddressAndSocketAccess() {
                                 });
                                 wModal.dispatchEvent(focusInEvent);
                                 console.log('FocusIn event dispatched on modal');
-
+                                debugger;
                                 let wButton = document.querySelector('button#web-workflow');
                                 if (wButton){
                                     let focusInEvent = new FocusEvent('focusin', {

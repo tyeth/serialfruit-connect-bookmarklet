@@ -39,7 +39,7 @@ This is the bookmarklet code to copy and paste into address bar:
 ```
 javascript:(function() {
     var script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/gh/tyeth/serialfruit-connect@v0.0.6/src/bookmarklet.js';
+    script.src = 'https://cdn.jsdelivr.net/gh/tyeth/serialfruit-connect@v0.0.7/src/bookmarklet.js';
     document.body.appendChild(script);
 })();
 ```

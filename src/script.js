@@ -312,7 +312,7 @@ async function ensureAddressAndSocketAccess() {
 
             // check if device connected state on page and reconnect
             let connectButton = document.querySelector('button.btn-connect');
-            connectButton = hasOwnProperty(connectButton,"length") && connectButton.length > 1 ? connectButton[0] : connectButton;
+            connectButton = Object.prototype.hasOwnProperty("length", connectButton) && connectButton.length > 1 ? connectButton[0] : connectButton;
             if (connectButton) {
                 if (connectButton.textContent === 'Disconnect') {
                     console.log('Device already connected, disconnecting first');
@@ -320,7 +320,7 @@ async function ensureAddressAndSocketAccess() {
                     setTimeout(() => {
                         console.log('Reconnecting device');
                         let cButton = document.querySelector('button.btn-connect');
-                        cButton = hasOwnProperty(cButton,"length") && cButton.length > 1 ? cButton[0] : cButton;
+                        cButton = Object.prototype.hasOwnProperty("length", cButton) && cButton.length > 1 ? cButton[0] : cButton;
                         cButton.click();
                         setTimeout(() => {
                             //button#web-workflow click

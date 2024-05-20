@@ -14,217 +14,103 @@ class BluefruitPacket {
     constructor(packetType, payload) {
         this.packetType = packetType;
         this.payload = payload;
-        this.packetLen = payload.length + 2; // Packet type + Length + Payload + Checksum
+        this.packetLen = payload.length;
     }
 
-    // Calculate checksum using two's complement
-    calculateChecksum() {
-        let sum = this.packetType + this.packetLen;
-        for (const byte of this.payload) {
-            sum += byte;
-        }
-        return (~sum + 1) & 0xFF; // Two's complement
+    toBytes() {
+        const length = this.payload.length + 3;
+        const checksum = this.checksum();
+        return Uint8Array.from([length, ...this.packetType.split('').map(c => c.charCodeAt(0)), ...this.payload, checksum]);
     }
 
-    // Convert packet to Uint8Array
     toArray() {
-        const packetArray = [this.packetType, this.packetLen, ...this.payload];
-        const checksum = this.calculateChecksum();
-        packetArray.push(checksum);
-        return new Uint8Array(packetArray);
+        return Array.from(this.toBytes());
+    }
+
+    checksum() {
+        return this.payload.reduce((sum, value) => (sum + value) & 0xFF, 0);
     }
 }
 
-// Packet types
-const PacketType = {
-    CONNECTED: 0x01,
-    DISCONNECTED: 0x02,
-    ATCOMMAND: 0x0A,
-    DFU: 0x0B,
-    SECURITY: 0x0C,
-    CONTROL: 0x0D,
-    COLOR: 0x0E,
-    LOCATION: 0x0F,
-    TEMPERATURE: 0x10,
-    BUTTON: 0x11,
-    ACCELEROMETER: 0x12,
-    GYROSCOPE: 0x13,
-    QUATERNION: 0x14,
-    MAGNETOMETER: 0x15,
-    READ: 0x16,
-    WRITE: 0x17,
-    NOTIFY: 0x18,
-    SCAN: 0x19,
-    IOPIN: 0x1A,
-    NEOPIXEL: 0x1B,
-    STRING: 0x1C,
-    RAW: 0x1D
-};
+// Packet classes for specific types
+class XYZPacket extends BluefruitPacket {
+    constructor(x, y, z) {
+        const payload = new Float32Array([x, y, z]).buffer;
+        super('!XYZ', new Uint8Array(payload));
+    }
+}
 
-// AT Command Packet class
+class AccelerometerPacket extends XYZPacket {
+    constructor(x, y, z) {
+        super(x, y, z);
+    }
+}
+
+class ButtonPacket extends BluefruitPacket {
+    constructor(button, pressed) {
+        const payload = new Uint8Array([button.charCodeAt(0), pressed ? 1 : 0]);
+        super('!B', payload);
+    }
+}
+
+class ColorPacket extends BluefruitPacket {
+    constructor(r, g, b) {
+        const payload = new Uint8Array([r, g, b]);
+        super('!C', payload);
+    }
+}
+
+class GyroPacket extends XYZPacket {
+    constructor(x, y, z) {
+        super(x, y, z);
+    }
+}
+
+class LocationPacket extends BluefruitPacket {
+    constructor(latitude, longitude, altitude) {
+        const payload = new Float32Array([latitude, longitude, altitude]).buffer;
+        super('!L', new Uint8Array(payload));
+    }
+}
+
+class MagnetometerPacket extends XYZPacket {
+    constructor(x, y, z) {
+        super(x, y, z);
+    }
+}
+
+class QuaternionPacket extends BluefruitPacket {
+    constructor(w, x, y, z) {
+        const payload = new Float32Array([w, x, y, z]).buffer;
+        super('!Q', new Uint8Array(payload));
+    }
+}
+
+class RawTextPacket extends BluefruitPacket {
+    constructor(text) {
+        const payload = new TextEncoder().encode(text);
+        super('!T', payload);
+    }
+}
+
 class ATCommandPacket extends BluefruitPacket {
     constructor(commandString) {
         const payload = Array.from(new TextEncoder().encode(commandString));
-        super(PacketType.ATCOMMAND, payload);
+        super('!A', payload);
     }
 }
 
-// Control Command Packet class
 class ControlCommandPacket extends BluefruitPacket {
     constructor(command, value) {
         const payload = [command, value];
-        super(PacketType.CONTROL, payload);
+        super('!D', payload);
     }
 }
 
-// Color Packet class
-class ColorPacket extends BluefruitPacket {
-    constructor(red, green, blue) {
-        const payload = [red, green, blue];
-        super(PacketType.COLOR, payload);
-    }
-}
-
-// Location Packet class
-class LocationPacket extends BluefruitPacket {
-    constructor(latitude, longitude) {
-        const payload = new DataView(new ArrayBuffer(8));
-        payload.setFloat32(0, latitude, true);
-        payload.setFloat32(4, longitude, true);
-        super(PacketType.LOCATION, new Uint8Array(payload.buffer));
-    }
-}
-
-// Temperature Packet class
 class TemperaturePacket extends BluefruitPacket {
     constructor(temperature) {
-        const payload = new DataView(new ArrayBuffer(4));
-        payload.setFloat32(0, temperature, true);
-        super(PacketType.TEMPERATURE, new Uint8Array(payload.buffer));
-    }
-}
-
-// Button Packet class
-class ButtonPacket extends BluefruitPacket {
-    constructor(button, state) {
-        const payload = [button, state];
-        super(PacketType.BUTTON, payload);
-    }
-}
-
-// Accelerometer Packet class
-class AccelerometerPacket extends BluefruitPacket {
-    constructor(x, y, z) {
-        const payload = new DataView(new ArrayBuffer(12));
-        payload.setFloat32(0, x, true);
-        payload.setFloat32(4, y, true);
-        payload.setFloat32(8, z, true);
-        super(PacketType.ACCELEROMETER, new Uint8Array(payload.buffer));
-    }
-}
-
-// Gyroscope Packet class
-class GyroscopePacket extends BluefruitPacket {
-    constructor(x, y, z) {
-        const payload = new DataView(new ArrayBuffer(12));
-        payload.setFloat32(0, x, true);
-        payload.setFloat32(4, y, true);
-        payload.setFloat32(8, z, true);
-        super(PacketType.GYROSCOPE, new Uint8Array(payload.buffer));
-    }
-}
-
-// Quaternion Packet class
-class QuaternionPacket extends BluefruitPacket {
-    constructor(w, x, y, z) {
-        const payload = new DataView(new ArrayBuffer(16));
-        payload.setFloat32(0, w, true);
-        payload.setFloat32(4, x, true);
-        payload.setFloat32(8, y, true);
-        payload.setFloat32(12, z, true);
-        super(PacketType.QUATERNION, new Uint8Array(payload.buffer));
-    }
-}
-
-// Magnetometer Packet class
-class MagnetometerPacket extends BluefruitPacket {
-    constructor(x, y, z) {
-        const payload = new DataView(new ArrayBuffer(12));
-        payload.setFloat32(0, x, true);
-        payload.setFloat32(4, y, true);
-        payload.setFloat32(8, z, true);
-        super(PacketType.MAGNETOMETER, new Uint8Array(payload.buffer));
-    }
-}
-
-// DFU Packet class
-class DFUPacket extends BluefruitPacket {
-    constructor(payload) {
-        super(PacketType.DFU, payload);
-    }
-}
-
-// Security Packet class
-class SecurityPacket extends BluefruitPacket {
-    constructor(payload) {
-        super(PacketType.SECURITY, payload);
-    }
-}
-
-// Read Packet class
-class ReadPacket extends BluefruitPacket {
-    constructor(payload) {
-        super(PacketType.READ, payload);
-    }
-}
-
-// Write Packet class
-class WritePacket extends BluefruitPacket {
-    constructor(payload) {
-        super(PacketType.WRITE, payload);
-    }
-}
-
-// Notify Packet class
-class NotifyPacket extends BluefruitPacket {
-    constructor(payload) {
-        super(PacketType.NOTIFY, payload);
-    }
-}
-
-// Scan Packet class
-class ScanPacket extends BluefruitPacket {
-    constructor(payload) {
-        super(PacketType.SCAN, payload);
-    }
-}
-
-// IO Pin Packet class
-class IOPinPacket extends BluefruitPacket {
-    constructor(payload) {
-        super(PacketType.IOPIN, payload);
-    }
-}
-
-// Neopixel Packet class
-class NeopixelPacket extends BluefruitPacket {
-    constructor(payload) {
-        super(PacketType.NEOPIXEL, payload);
-    }
-}
-
-// String Packet class
-class StringPacket extends BluefruitPacket {
-    constructor(payload) {
-        const payloadArray = Array.from(new TextEncoder().encode(payload));
-        super(PacketType.STRING, payloadArray);
-    }
-}
-
-// Raw Data Packet class
-class RawPacket extends BluefruitPacket {
-    constructor(payload) {
-        super(PacketType.RAW, payload);
+        const payload = new Float32Array([temperature]).buffer;
+        super('!T', new Uint8Array(payload));
     }
 }
 

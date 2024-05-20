@@ -35,9 +35,7 @@ This project is a web-based tool that allows you to send various types of data p
 
 See `./examples` folder for a Crickit based project that previously required bluetooth
 
-link test [here](javascript:void(alert('Hello, World!')))
-
-Next is a link to the bookmarklet code which you can right click <a href='javascript:(function(){var script=document.createElement("script");script.src="https://cdn.jsdelivr.net/gh/tyeth/serialfruit-connect@v0.0.9/src/bookmarklet.js";document.body.appendChild(script);})();'>HERE</a> and choose add to favourites/bookmark,
+Next is a link to the bookmarklet code which you can right click <a href="javascript:(function(){var script=document.createElement('script');script.src='https://cdn.jsdelivr.net/gh/tyeth/serialfruit-connect@v0.0.9/src/bookmarklet.js';document.body.appendChild(script);})();">HERE</a> and choose add to favourites/bookmark,
 
 Or the bookmarklet code to copy and paste into address bar: 
 ```

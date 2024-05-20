@@ -54,8 +54,9 @@
         document.body.appendChild(toggleButton);
         console.log('Toggle button added');
     };
-    script.onerror = function() {
-        console.error('Failed to load the script');
+    script.onerror = function(error) {
+        debugger;
+        console.error('Failed to load the script', error);
     };
     document.body.appendChild(script);
 })();

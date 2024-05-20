@@ -453,7 +453,7 @@ async function sendPacket(packet) {
     try {
         const packetArray = packet.toArray();
         await writer.write(packetArray);
-        console.log("Packet sent:", packetArray);
+        console.log("Successfully sent packet:", packetArray);
     } catch (error) {
         console.error("Failed to send packet: ", error);
     }

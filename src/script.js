@@ -244,6 +244,37 @@ async function connectSerial() {
 
 // Send packet via the serial connection
 async function sendPacket(packet) {
+    if (window.location.host.match(/^((192.168)|(cpy-))/i) && window.Location.pathname.endsWith('cp/serial')) {
+        console.log('Sending packet:', packet);
+        debugger;
+        ws = ws || new WebSocket('ws://' + window.location.host + '/ws/serial');
+        ws.send(packet.toArray());
+        console.log('Packet sent:', packet.toArray());
+        return;
+    }
+    else if (window.location.hostname.match(/code.circuitpython.org/i)) {
+        // check if device connected state on page
+
+        // check if Serial panel is visible
+
+        // check if Serial panel is connected
+
+        // send packet
+        throw NotImplementedError('Code.CircuitPython.Org support not implemented yet - try using webserial.io or the device web workflow page (at device IP or circuitpython.local)');
+    } else if (window.location.host.match(/webserial.io/i)) {
+        // check if device connected state on page
+
+        // check if Serial panel is visible
+
+        // check if Serial panel is connected
+
+        // send packet
+        throw NotImplementedError('WebSerial.io support not implemented yet - try using the device web workflow page (at device IP or circuitpython.local)');
+    } else {
+        console.error('Unsupported host:', window.location.host);
+        // fallback to doing connectSerial or BLE ourselves
+    }
+
     if (!writer) await connectSerial();
     try {
         const packetArray = packet.toArray();
@@ -403,3 +434,5 @@ function getCurrentLocation() {
         sendLocation();
     });
 }
+
+showScreen('main-menu');

@@ -4,27 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bluefruit Web Serial</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/tyeth/serialfruit-connect@v0.0.2/src/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/tyeth/serialfruit-connect@main/src/style.css">
 </head>
 <body>
     <div id="main-menu" class="screen">
-        <h1>Bluefruit Web Serial</h1>
-        <button onclick="showScreen('color-picker')">Color Picker</button>
-        <button onclick="showScreen('control-pad')">Control Pad</button>
-        <button onclick="showScreen('accelerometer')">Accelerometer</button>
-        <button onclick="showScreen('terminal')">Terminal</button>
-        <button onclick="showScreen('dfu')">DFU</button>
-        <button onclick="showScreen('security')">Security</button>
-        <button onclick="showScreen('read-write')">Read/Write</button>
-        <button onclick="showScreen('notify')">Notify</button>
-        <button onclick="showScreen('scan')">Scan</button>
-        <button onclick="showScreen('iopin')">IO Pin</button>
-        <button onclick="showScreen('neopixel')">Neopixel</button>
-        <button onclick="showScreen('string')">String</button>
-        <button onclick="showScreen('raw')">Raw Data</button>
-        <button onclick="showScreen('location')">Location</button>
-    </div>
+        <div>
+            <dl>
+                <dt>
+                    <h1>Serial Fruit Connect</h1><br/>
+                </dt>
+                <dd>Connect to your Bluefruit/USB/WiFi device and send commands</dt>
+            </dl>
+        </div>
+        <div>
 
+            <button onclick="showScreen('color-picker')">Color Picker</button>
+            <button onclick="showScreen('control-pad')">Control Pad</button>
+            <button onclick="showScreen('accelerometer')">Accelerometer</button>
+            <button onclick="showScreen('terminal')">Terminal</button>
+            <button onclick="showScreen('dfu')">DFU</button>
+            <button onclick="showScreen('security')">Security</button>
+            <button onclick="showScreen('read-write')">Read/Write</button>
+            <button onclick="showScreen('notify')">Notify</button>
+            <button onclick="showScreen('scan')">Scan</button>
+            <button onclick="showScreen('iopin')">IO Pin</button>
+            <button onclick="showScreen('neopixel')">Neopixel</button>
+            <button onclick="showScreen('string')">String</button>
+            <button onclick="showScreen('raw')">Raw Data</button>
+            <button onclick="showScreen('location')">Location</button>
+        </div>
+    </div>
+    
     <!-- Color Picker Screen -->
     <div id="color-picker" class="screen">
         <h1>Color Picker</h1>
@@ -41,6 +51,7 @@
         <button onclick="sendControlCommand(3)">Left</button>
         <button onclick="sendControlCommand(4)">Right</button>
         <button onclick="showScreen('main-menu')">Back</button>
+        <!-- Add JoyStick.js in future -->
     </div>
 
     <!-- Accelerometer Screen -->
@@ -144,6 +155,6 @@
         <button onclick="showScreen('main-menu')">Back</button>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/gh/tyeth/serialfruit-connect@v0.0.2/src/script.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/tyeth/serialfruit-connect@main/src/script.js"></script>
 </body>
 </html>

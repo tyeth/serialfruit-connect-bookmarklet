@@ -236,7 +236,7 @@ async function connectAnySerial() {
     if (writer) return;
     if (webworkflow_serial) {
         //setup textencoder for writer to websocket
-        ws = getTrackedSockets().find((ws) => ws.url === 'ws://' + window.location.host + '/ws/serial' && ws.readyState === 1);
+        ws = getTrackedSockets().find((ws) => ws.readyState === 1);
         if (ws) {
             writer = {
                 write: async (data) => {

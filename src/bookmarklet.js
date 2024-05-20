@@ -16,7 +16,7 @@
         
         // Create the side panel
         var panel = document.createElement("div");
-        panel.id = "serialfruit-panel";
+        panel.id = "serialfruit-body";
         panel.style.cssText = "position:fixed;top:0;right:-300px;width:300px;height:100%;background:#fff;box-shadow:-2px 0 5px rgba(0,0,0,0.5);transition:right 0.3s;z-index:10000;overflow:auto;";
         document.body.appendChild(panel);
         console.log('Panel created');

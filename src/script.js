@@ -244,7 +244,7 @@ async function connectSerial() {
 
 // Send packet via the serial connection
 async function sendPacket(packet) {
-    if (window.location.host.match(/^((192.168)|(cpy-))/i) && window.Location.pathname.endsWith('cp/serial')) {
+    if (window.location.host.match(/^((192.168)|(cpy-))/i) && window.location.pathname.endsWith('cp/serial')) {
         console.log('Sending packet:', packet);
         debugger;
         ws = ws || new WebSocket('ws://' + window.location.host + '/ws/serial');

@@ -54,6 +54,8 @@ src_files = glob.glob(src_dir + '**', recursive=True)
 
 # Replace the old commit SHA or 'main' with the new tag in each file
 for file in src_files:
+    if os.path.isdir(file):
+        continue
     with fileinput.FileInput(file, inplace=True) as f:
         for line in f:
             print(line.replace(base_url + commit_sha_or_main + "/", base_url + new_tag + "/"), end='')

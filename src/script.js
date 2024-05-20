@@ -250,10 +250,11 @@ async function connectAnySerial() {
                         }
                     }
                     console.log('Sending packet:', data);
-                    Array.prototype.forEach(element => {
+                    for (var i = 0; i < data.length; i++) {
+                        let element = data[i];
                         console.log('Sending element:', element);
                         ws.send(element);
-                    }, data);
+                    };
                     console.log('Packet(s) sent:', data);
                 }
             };

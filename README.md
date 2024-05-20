@@ -23,13 +23,11 @@ This project is a web-based tool that allows you to send various types of data p
 
 ### Prerequisites
 
-- A web browser that supports the Web Serial API (e.g., Chrome, Edge).
-- A device that supports serial communication.
+- A device (running circuitpython?) that supports serial communication.
+- Using web workflow requires any compatible browser
+- Using USB-Serial or BLE requires a web browser that supports the Web Serial or BLE API
 
-### Installation
-
-1. Clone the repository or download the project files.
-2. Open the `index.html` file in a web browser.
+_If you have problems then try a Chromium based web browser (e.g., Chrome, Edge)._
 
 ### Usage
 

@@ -241,10 +241,9 @@ async function connectAnySerial() {
             writer = {
                 write: async (data) => {
                     console.log('Sending packet:', data);
-                    encodedData = new TextEncoder().encode(data);
                     Array.prototype.forEach(element => {
-                        ws.send(c);
-                    }, encodedData);
+                        ws.send(element);
+                    }, data);
                     console.log('Packet(s) sent:', data);
                 }
             };

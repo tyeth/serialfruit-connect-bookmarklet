@@ -38,12 +38,14 @@
         toggleButton.innerText = "Toggle Panel";
         toggleButton.style.cssText = "position:fixed;top:10px;right:10px;width:100px;height:auto;z-index:10001;";
         toggleButton.onclick = function() {
+            this.style.width = "auto";
+            this.style.height = "30px";
             if (panel.style.right === "0px") {
                 panel.style.right = "-300px";
-                this.innerText = "&gt;";
+                this.innerText = "<";
             } else {
                 panel.style.right = "0px";
-                this.innerText = "&lt;";
+                this.innerText = ">";
             }
         };
         document.body.appendChild(toggleButton);

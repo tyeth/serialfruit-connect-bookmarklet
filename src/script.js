@@ -236,6 +236,18 @@ async function connectAnySerial() {
     if (writer) return;
     if (webworkflow_serial) {
         //setup textencoder for writer to websocket
+        ws = getTrackedSockets().find((ws) => ws.url === 'ws://' + window.location.host + '/ws/serial' && ws.readyState === 1);
+        if (ws) {
+            writer = {
+                write: async (data) => {
+                    console.log('Sending packet:', data);
+                    ws.send(new TextEncoder().encode(data));
+                    console.log('Packet sent:', data);
+                }
+            };
+        } else {
+            console.error("WebSocket not found or not connected.");
+        }
     } else if (ble_serial) {
         console.error("BLE serial not supported yet");
     } else {
@@ -263,6 +275,7 @@ async function connectSerial() {
 // Ensure access to serial port and writer
 async function ensureAddressAndSocketAccess() {
     if (window.location.host.match(/^((192.168)|(cpy-))/i)) {
+        webworkflow_serial = true;
         if (window.location.pathname.endsWith('cp/serial')) {
             console.log('Sending packet:', packet);
             debugger;

@@ -240,6 +240,15 @@ async function connectAnySerial() {
         if (ws) {
             writer = {
                 write: async (data) => {
+                    if (!ws || ws.readyState !== 1) {
+                        console.error("WebSocket not found or not connected, attempting to reget.");
+                        debugger;
+                        ws = getTrackedSockets().find((ws) => ws.readyState === 1);
+                        if (!ws) {
+                            console.error("WebSocket not found or not connected.");
+                            return;
+                        }
+                    }
                     console.log('Sending packet:', data);
                     Array.prototype.forEach(element => {
                         ws.send(element);

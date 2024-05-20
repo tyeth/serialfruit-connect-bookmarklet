@@ -324,7 +324,14 @@ async function ensureAddressAndSocketAccess() {
                             //button#web-workflow click
                             console.log('Clicking button#web-workflow');
                             let wButton = document.querySelector('button#web-workflow');
-                            if (wButton) wButton.click();
+                            if (wButton){
+                                let clickEvent = new MouseEvent('click', {
+                                    view: window,
+                                    bubbles: true,
+                                    cancelable: true
+                                });
+                                wButton.dispatchEvent(clickEvent);
+                            }
                         }, 800);
                     }, 800);
                 } else {
@@ -341,7 +348,7 @@ async function ensureAddressAndSocketAccess() {
                     console.log('Serial panel hidden, clicking button#btn-mode-serial');
                     setTimeout(() => {
                         document.getElementById('btn-mode-serial').click();
-                    }, 1200);
+                    }, 1800);
                 } else {
                     console.log('Serial panel already visible');
                 }
@@ -352,7 +359,7 @@ async function ensureAddressAndSocketAccess() {
             // check if Serial panel is connected
 
             // send packet
-            throw Error('CircuitPython.org support not implemented yet - try using webserial.io or the device web workflow page (at device IP or circuitpython.local)');
+            console.error('CircuitPython.org support not implemented yet - try using webserial.io or the device web workflow page (at device IP or circuitpython.local)');
         } else {
             console.log("SerialFruit: Unsupported path:", window.location.pathname);
             // fallback to doing connectSerial or BLE ourselves

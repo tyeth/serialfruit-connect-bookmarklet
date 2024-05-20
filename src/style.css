@@ -7,18 +7,21 @@
     align-items: center;
     height: 100vh;
     background-color: #f0f0f0;
-}
-
-.serialfruit-body .screen {
-    display: none;
+    
     flex-direction: row;
     align-items: center;
     text-align: center;
     flex-wrap: wrap;
 }
 
+.serialfruit-body .screen {
+    display: none;
+}
 .serialfruit-body #main-menu {
     flex-direction: column;
+}
+.serialfruit-body .screen.active {
+    display: flex;
 }
 
 .serialfruit-body  .screen h1 {

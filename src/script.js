@@ -248,6 +248,7 @@ async function connectAnySerial() {
                             console.error("WebSocket not found or not connected.");
                             return;
                         }
+                        console.log('WebSocket refetched:', ws);
                     }
                     console.log('Sending packet:', data);
                     for (var i = 0; i < data.length; i++) {

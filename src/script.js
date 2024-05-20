@@ -302,10 +302,11 @@ async function ensureAddressAndSocketAccess() {
                     }
                     return;
                 }
-            
+            } else {
+
                 const originalWebSocket = window.WebSocket;
                 const trackedSockets = [];
-
+                
                 function TrackingWebSocket(url, protocols) {
                     const ws = new originalWebSocket(url, protocols);
                     trackedSockets.push(ws);
@@ -315,104 +316,104 @@ async function ensureAddressAndSocketAccess() {
 
                 TrackingWebSocket.prototype = originalWebSocket.prototype;
                 window.WebSocket = TrackingWebSocket;
-
+                
                 window.getTrackedSockets = function () {
                     return trackedSockets;
                 };
-                window._trackedSocket = trackedSockets;
-
+                window._trackedSockets = trackedSockets;
+                
                 console.log('WebSocket tracking enabled.');
-
-                // check if device connected state on page and reconnect
-                let connectButton = document.querySelector('button.btn-connect');
-                connectButton = Object.prototype.hasOwnProperty("length", connectButton) && connectButton.length > 1 ? connectButton[0] : connectButton;
-                if (connectButton) {
-                    if (connectButton.textContent === 'Disconnect') {
-                        console.log('Device already connected, disconnecting first');
-                        connectButton.click();
+            }
+                
+            // check if device connected state on page and reconnect
+            let connectButton = document.querySelector('button.btn-connect');
+            connectButton = Object.prototype.hasOwnProperty("length", connectButton) && connectButton.length > 1 ? connectButton[0] : connectButton;
+            if (connectButton) {
+                if (connectButton.textContent === 'Disconnect') {
+                    console.log('Device already connected, disconnecting first');
+                    connectButton.click();
+                    setTimeout(() => {
+                        console.log('Reconnecting device');
+                        let cButton = document.querySelector('button.btn-connect');
+                        cButton = Object.prototype.hasOwnProperty("length", cButton) && cButton.length > 1 ? cButton[0] : cButton;
+                        cButton.click();
                         setTimeout(() => {
-                            console.log('Reconnecting device');
-                            let cButton = document.querySelector('button.btn-connect');
-                            cButton = Object.prototype.hasOwnProperty("length", cButton) && cButton.length > 1 ? cButton[0] : cButton;
-                            cButton.click();
-                            setTimeout(() => {
-                                //button#web-workflow click
-                                console.log('Triggering button#web-workflow with event');
-                                // first trigger focusIn on <div class="popup-modal shadow prompt closable is--visible" 
-                                // and on button#web-workflow
-                                let wModal = document.querySelector('div.popup-modal.is--visible[data-popup-modal="connection-type"]');
-                                if (wModal){
+                            //button#web-workflow click
+                            console.log('Triggering button#web-workflow with event');
+                            // first trigger focusIn on <div class="popup-modal shadow prompt closable is--visible" 
+                            // and on button#web-workflow
+                            let wModal = document.querySelector('div.popup-modal.is--visible[data-popup-modal="connection-type"]');
+                            if (wModal){
+                                let focusInEvent = new FocusEvent('focusin', {
+                                    view: wModal.ownerDocument.defaultView,
+                                    bubbles: true,
+                                    cancelable: false
+                                });
+                                wModal.dispatchEvent(focusInEvent);
+                                console.log('FocusIn event dispatched on modal');
+                                debugger;
+                                let wButton = document.querySelector('button#web-workflow');
+                                if (wButton){
                                     let focusInEvent = new FocusEvent('focusin', {
-                                        view: wModal.ownerDocument.defaultView,
+                                        view: wButton.ownerDocument.defaultView,
                                         bubbles: true,
                                         cancelable: false
                                     });
-                                    wModal.dispatchEvent(focusInEvent);
-                                    console.log('FocusIn event dispatched on modal');
-                                    debugger;
-                                    let wButton = document.querySelector('button#web-workflow');
-                                    if (wButton){
-                                        let focusInEvent = new FocusEvent('focusin', {
-                                            view: wButton.ownerDocument.defaultView,
-                                            bubbles: true,
-                                            cancelable: false
-                                        });
-                                        wButton.dispatchEvent(focusInEvent);
-                                        // use PointerEvent with target instead of MouseEvent
-                                        let clickEvent = new PointerEvent('click', {
-                                            view: wButton.ownerDocument.defaultView,
-                                            bubbles: true,
-                                            cancelable: false,
-                                            pointerType: 'mouse',
-                                            button: 0,
-                                            buttons: 1,
-                                            isPrimary: true,
-                                            isTrusted: true,
-                                            target: wButton
-                                        });
-                                        wButton.dispatchEvent(clickEvent);
-                                        // let clickEvent = new MouseEvent('click', {
-                                        //     view: wButton.ownerDocument.defaultView,
-                                        //     bubbles: true,
-                                        //     cancelable: false
-                                        // });
-                                        // wButton.dispatchEvent(clickEvent);
-                                        console.log('Button#web-workflow event dispatched');
-                                    } else {
-                                        console.error('Button#web-workflow not found - click manually');
-                                    }
+                                    wButton.dispatchEvent(focusInEvent);
+                                    // use PointerEvent with target instead of MouseEvent
+                                    let clickEvent = new PointerEvent('click', {
+                                        view: wButton.ownerDocument.defaultView,
+                                        bubbles: true,
+                                        cancelable: false,
+                                        pointerType: 'mouse',
+                                        button: 0,
+                                        buttons: 1,
+                                        isPrimary: true,
+                                        isTrusted: true,
+                                        target: wButton
+                                    });
+                                    wButton.dispatchEvent(clickEvent);
+                                    // let clickEvent = new MouseEvent('click', {
+                                    //     view: wButton.ownerDocument.defaultView,
+                                    //     bubbles: true,
+                                    //     cancelable: false
+                                    // });
+                                    // wButton.dispatchEvent(clickEvent);
+                                    console.log('Button#web-workflow event dispatched');
                                 } else {
-                                    console.error('Modal not found - click manually');
+                                    console.error('Button#web-workflow not found - click manually');
                                 }
-                            }, 800);
+                            } else {
+                                console.error('Modal not found - click manually');
+                            }
                         }, 800);
-                    } else {
-                        console.log('Device already disconnected, new socket will be caught');
-                    }
+                    }, 800);
                 } else {
-                    console.error('Connect button not found');
+                    console.log('Device already disconnected, new socket will be caught');
                 }
-
-                // check if Serial panel (id serial-page) is visible or click button#btn-mode-serial
-                const serialPanel = document.getElementById('serial-page');
-                if (serialPanel) {
-                    if (serialPanel.style.display === 'none') {
-                        console.log('Serial panel hidden, clicking button#btn-mode-serial');
-                        setTimeout(() => {
-                            document.getElementById('btn-mode-serial').click();
-                        }, 1800);
-                    } else {
-                        console.log('Serial panel already visible');
-                    }
-                } else {
-                    console.error('Serial panel not found');
-                }
-
-                // check if Serial panel is connected
-
-                // send packet
-                console.error('CircuitPython.org support not implemented yet - try using webserial.io or the device web workflow page (at device IP or circuitpython.local)');
+            } else {
+                console.error('Connect button not found');
             }
+
+            // check if Serial panel (id serial-page) is visible or click button#btn-mode-serial
+            const serialPanel = document.getElementById('serial-page');
+            if (serialPanel) {
+                if (serialPanel.style.display === 'none') {
+                    console.log('Serial panel hidden, clicking button#btn-mode-serial');
+                    setTimeout(() => {
+                        document.getElementById('btn-mode-serial').click();
+                    }, 1800);
+                } else {
+                    console.log('Serial panel already visible');
+                }
+            } else {
+                console.error('Serial panel not found');
+            }
+
+            // check if Serial panel is connected
+
+            // send packet
+            console.error('CircuitPython.org support not implemented yet - try using webserial.io or the device web workflow page (at device IP or circuitpython.local)');
         } else {
             console.log("SerialFruit: Unsupported path:", window.location.pathname);
             // fallback to doing connectSerial or BLE ourselves

@@ -301,6 +301,9 @@ async function ensureAddressAndSocketAccess() {
                         console.log('Existing WebSocket connections forceably closed.');
                     }
                     return;
+                } else if (window.getTrackedSockets().length === 1) {
+                    console.log('Existing WebSocket connection found:', window.getTrackedSockets()[0]);
+                    return;
                 }
             } else {
 

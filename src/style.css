@@ -1,4 +1,4 @@
-body.serialfruit-body {
+.serialfruit-body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
@@ -9,39 +9,40 @@ body.serialfruit-body {
     background-color: #f0f0f0;
 }
 
-.serialfruit-body > .screen {
+.serialfruit-body .screen {
     display: none;
     flex-direction: row;
     align-items: center;
     text-align: center;
+    flex-wrap: wrap;
 }
 
-.serialfruit-body > #main-menu.screen {
+.serialfruit-body #main-menu {
     flex-direction: column;
 }
 
-.serialfruit-body > .screen h1 {
+.serialfruit-body  .screen h1 {
     margin-bottom: 20px;
 }
 
-.serialfruit-body > .screen button {
+.serialfruit-body  .screen button {
     margin: 10px;
     padding: 10px 20px;
     font-size: 16px;
 }
 
-.serialfruit-body > #color-picker input {
+.serialfruit-body  #color-picker input {
     margin-bottom: 20px;
 }
 
-.serialfruit-body > #terminal input {
+.serialfruit-body  #terminal input {
     margin-bottom: 10px;
     width: 80%;
     padding: 10px;
     font-size: 16px;
 }
 
-.serialfruit-body > #terminal pre {
+.serialfruit-body  #terminal pre {
     margin-top: 20px;
     background-color: #fff;
     padding: 10px;

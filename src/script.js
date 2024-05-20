@@ -311,9 +311,12 @@ async function ensureAddressAndSocketAccess() {
             const connectButton = document.querySelector('button.btn-connect');
             if (connectButton) {
                 if (connectButton.textContent === 'Disconnect') {
+                    console.log('Device already connected, disconnecting first');
                     connectButton.click();
                     setTimeout(() => {
-                        connectButton.click();
+                        console.log('Reconnecting device');
+                        let cButton = document.querySelector('button.btn-connect');
+                        cButton.click();
                     }, 800);
                 } else {
                     console.log('Device already disconnected, new socket will be caught');
@@ -326,6 +329,7 @@ async function ensureAddressAndSocketAccess() {
             const serialPanel = document.getElementById('serial-page');
             if (serialPanel) {
                 if (serialPanel.style.display === 'none') {
+                    console.log('Serial panel hidden, clicking button#btn-mode-serial');
                     setTimeout(() => {
                         document.getElementById('btn-mode-serial').click();
                     }, 1200);

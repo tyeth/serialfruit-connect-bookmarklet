@@ -229,21 +229,39 @@ class RawPacket extends BluefruitPacket {
 }
 
 // Initialize global variables for serial port and writer
-let port, writer, accelerometerEnabled = false;
+let port, writer, webworkflow_serial, ble_serial, accelerometerEnabled = false;
+
+// Connect to serial or web serial (or eventually BLE serial)
+async function connectAnySerial() {
+    if (writer) return;
+    if (webworkflow_serial) {
+        //setup textencoder for writer to websocket
+    } else if (ble_serial) {
+        console.error("BLE serial not supported yet");
+    } else {
+        if ('serial' in navigator) {
+            console.log("Attempting to connect to serial port...");
+            await connectSerial();
+        } else {
+            console.error("Web USB-serial not supported, try a Chromium based browser like Chrome or Edge.");
+        }
+    }
+}
 
 // Connect to the serial port
 async function connectSerial() {
     try {
         port = await navigator.serial.requestPort();
-        await port.open({ baudRate: 9600 });
+        await port.open({ baudRate: 115200 });
         writer = port.writable.getWriter();
+        console.log("Connected to serial port", port);
     } catch (error) {
         console.error("Failed to connect to serial port: ", error);
     }
 }
 
-// Send packet via the serial connection
-async function sendPacket(packet) {
+// Ensure access to serial port and writer
+async function ensureAddressAndSocketAccess() {
     if (window.location.host.match(/^((192.168)|(cpy-))/i)) {
         if (window.location.pathname.endsWith('cp/serial')) {
             console.log('Sending packet:', packet);
@@ -254,6 +272,21 @@ async function sendPacket(packet) {
             return;
         } else if (window.location.pathname == "/code/") {
             // monkey patch websockets to allow reuse
+            if (window.getTrackedSockets) {
+                console.log('WebSocket tracking already enabled.');
+                debugger;
+                if (window.getTrackedSockets().count(ws => ws.readyState === WebSocket.OPEN)>1) {
+                    console.log('Unexpected MULTIPLE Existing WebSocket connections:', window.getTrackedSockets());
+                    for (const ws of window.getTrackedSockets()) {
+                        if (ws.state === WebSocket.OPEN) {
+                            console.log('Closing WebSocket:', ws);
+                            ws.close();
+                        }
+                    }
+                    console.log('Existing WebSocket connections forceably closed.');
+                return;
+
+            }
             const originalWebSocket = window.WebSocket;
             const trackedSockets = [];
     
@@ -333,7 +366,11 @@ async function sendPacket(packet) {
         console.error('SerialFruit: Unsupported host:', window.location.host);
         // fallback to doing connectSerial or BLE ourselves
     }
+}
 
+// Send packet via the serial connection
+async function sendPacket(packet) {
+    ensureAddressAndSocketAccess();
     if (!writer) await connectSerial();
     try {
         const packetArray = packet.toArray();

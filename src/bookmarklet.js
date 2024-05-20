@@ -28,6 +28,9 @@
                 panel.innerHTML = html + panel.innerHTML;
                 console.log('HTML content loaded into the panel');
                 setTimeout(showScreen('main-menu'), 100);
+                setTimeout(async () => {
+                    await ensureAddressAndSocketAccess();
+                }, 1000);
             })
             .catch(error => {
                 console.error('Error loading HTML content:', error);

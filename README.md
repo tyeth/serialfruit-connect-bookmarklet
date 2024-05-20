@@ -35,7 +35,9 @@ This project is a web-based tool that allows you to send various types of data p
 
 See `./examples` folder for a Crickit based project that previously required bluetooth
 
-This is the bookmarklet code to copy and paste into address bar:
+Next is a link to the bookmarklet code which you can right click <a href='javascript:(function(){var script=document.createElement("script");script.src="https://cdn.jsdelivr.net/gh/tyeth/serialfruit-connect@v0.0.8/src/bookmarklet.js";document.body.appendChild(script);})();'>HERE</a> and choose add to favourites/bookmark,
+
+Or the bookmarklet code to copy and paste into address bar: 
 ```
 javascript:(function() {
     var script = document.createElement('script');
@@ -43,6 +45,11 @@ javascript:(function() {
     document.body.appendChild(script);
 })();
 ```
+_(You may need to add the `javascript:` prefix back into the address bar after pasting the code from above, as browsers remove it as part of keeping you safe - bookmarks are not affected by this protection)_
+
+
+## Available User Interface (UI) screens
+
 
 1. **Color Picker**:
     - Select a color using the color input.

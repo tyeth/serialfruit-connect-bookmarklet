@@ -275,7 +275,7 @@ async function ensureAddressAndSocketAccess() {
             if (window.getTrackedSockets) {
                 console.log('WebSocket tracking already enabled.');
                 debugger;
-                if (window.getTrackedSockets().count(ws => ws.readyState === WebSocket.OPEN)>1) {
+                if (window.getTrackedSockets().count(ws => ws.readyState === WebSocket.OPEN) > 1) {
                     console.log('Unexpected MULTIPLE Existing WebSocket connections:', window.getTrackedSockets());
                     for (const ws of window.getTrackedSockets()) {
                         if (ws.state === WebSocket.OPEN) {
@@ -284,87 +284,88 @@ async function ensureAddressAndSocketAccess() {
                         }
                     }
                     console.log('Existing WebSocket connections forceably closed.');
-                return;
+                    return;
 
-            }
-            const originalWebSocket = window.WebSocket;
-            const trackedSockets = [];
-    
-            function TrackingWebSocket(url, protocols) {
-                const ws = new originalWebSocket(url, protocols);
-                trackedSockets.push(ws);
-                console.log('WebSocket created:', ws);
-                return ws;
-            }
-    
-            TrackingWebSocket.prototype = originalWebSocket.prototype;
-            window.WebSocket = TrackingWebSocket;
-    
-            window.getTrackedSockets = function() {
-                return trackedSockets;
-            };
-    
-            console.log('WebSocket tracking enabled.');
-            
-            // check if device connected state on page and reconnect
-            const connectButton = document.querySelector('button.btn-connect');
-            if (connectButton) {
-                if (connectButton.textContent === 'Disconnect') {
-                    connectButton.click();
-                    setTimeout(() => {
+                }
+                const originalWebSocket = window.WebSocket;
+                const trackedSockets = [];
+
+                function TrackingWebSocket(url, protocols) {
+                    const ws = new originalWebSocket(url, protocols);
+                    trackedSockets.push(ws);
+                    console.log('WebSocket created:', ws);
+                    return ws;
+                }
+
+                TrackingWebSocket.prototype = originalWebSocket.prototype;
+                window.WebSocket = TrackingWebSocket;
+
+                window.getTrackedSockets = function () {
+                    return trackedSockets;
+                };
+
+                console.log('WebSocket tracking enabled.');
+
+                // check if device connected state on page and reconnect
+                const connectButton = document.querySelector('button.btn-connect');
+                if (connectButton) {
+                    if (connectButton.textContent === 'Disconnect') {
                         connectButton.click();
-                    }, 800);
+                        setTimeout(() => {
+                            connectButton.click();
+                        }, 800);
+                    } else {
+                        console.log('Device already disconnected, new socket will be caught');
+                    }
                 } else {
-                    console.log('Device already disconnected, new socket will be caught');
+                    console.error('Connect button not found');
                 }
-            } else {
-                console.error('Connect button not found');
-            }
 
-            // check if Serial panel (id serial-page) is visible or click button#btn-mode-serial
-            const serialPanel = document.getElementById('serial-page');
-            if (serialPanel) {
-                if (serialPanel.style.display === 'none') {
-                    setTimeout(() => {
-                        document.getElementById('btn-mode-serial').click();
-                    }, 1200);
+                // check if Serial panel (id serial-page) is visible or click button#btn-mode-serial
+                const serialPanel = document.getElementById('serial-page');
+                if (serialPanel) {
+                    if (serialPanel.style.display === 'none') {
+                        setTimeout(() => {
+                            document.getElementById('btn-mode-serial').click();
+                        }, 1200);
+                    } else {
+                        console.log('Serial panel already visible');
+                    }
                 } else {
-                    console.log('Serial panel already visible');
+                    console.error('Serial panel not found');
                 }
+
+                // check if Serial panel is connected
+
+                // send packet
+                throw Error('CircuitPython.org support not implemented yet - try using webserial.io or the device web workflow page (at device IP or circuitpython.local)');
             } else {
-                console.error('Serial panel not found');
+                console.log("SerialFruit: Unsupported path:", window.location.pathname);
+                // fallback to doing connectSerial or BLE ourselves
             }
+        }
+        else if (window.location.hostname.match(/code.circuitpython.org/i)) {
+            // check if device connected state on page
+
+            // check if Serial panel is visible
 
             // check if Serial panel is connected
 
             // send packet
-            throw Error('CircuitPython.org support not implemented yet - try using webserial.io or the device web workflow page (at device IP or circuitpython.local)');
+            throw Error('Code.CircuitPython.Org support not implemented yet - try using webserial.io or the device web workflow page (at device IP or circuitpython.local)');
+        } else if (window.location.host.match(/webserial.io/i)) {
+            // check if device connected state on page
+
+            // check if Serial panel is visible
+
+            // check if Serial panel is connected
+
+            // send packet
+            throw Error('WebSerial.io support not implemented yet - try using the device web workflow page (at device IP or circuitpython.local)');
         } else {
-            console.log("SerialFruit: Unsupported path:", window.location.pathname);
+            console.error('SerialFruit: Unsupported host:', window.location.host);
             // fallback to doing connectSerial or BLE ourselves
         }
-    }
-    else if (window.location.hostname.match(/code.circuitpython.org/i)) {
-        // check if device connected state on page
-
-        // check if Serial panel is visible
-
-        // check if Serial panel is connected
-
-        // send packet
-        throw Error('Code.CircuitPython.Org support not implemented yet - try using webserial.io or the device web workflow page (at device IP or circuitpython.local)');
-    } else if (window.location.host.match(/webserial.io/i)) {
-        // check if device connected state on page
-
-        // check if Serial panel is visible
-
-        // check if Serial panel is connected
-
-        // send packet
-        throw Error('WebSerial.io support not implemented yet - try using the device web workflow page (at device IP or circuitpython.local)');
-    } else {
-        console.error('SerialFruit: Unsupported host:', window.location.host);
-        // fallback to doing connectSerial or BLE ourselves
     }
 }
 

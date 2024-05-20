@@ -19,8 +19,15 @@ try:
 except subprocess.CalledProcessError:
     latest_tag = 'v0.0.1'
 
+V_PREFIX=True
+if latest_tag[0] != 'v':
+    V_PREFIX=False
+else:
+    latest_tag = latest_tag[1:]
+
 # Increment the patch version number
 new_tag = semver.bump_patch(latest_tag)
+new_tag = 'v' + new_tag if V_PREFIX else new_tag
 
 # Define the jsdelivr base URL
 base_url = 'https://cdn.jsdelivr.net/gh/tyeth/serialfruit-connect@'

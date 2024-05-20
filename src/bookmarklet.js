@@ -36,12 +36,14 @@
         // Add a toggle button to the document body
         var toggleButton = document.createElement("button");
         toggleButton.innerText = "Toggle Panel";
-        toggleButton.style.cssText = "position:fixed;top:10px;right:10px;width:100px;height:30px;z-index:10001;";
+        toggleButton.style.cssText = "position:fixed;top:10px;right:10px;width:100px;height:auto;z-index:10001;";
         toggleButton.onclick = function() {
             if (panel.style.right === "0px") {
                 panel.style.right = "-300px";
+                this.innerText = "&gt;";
             } else {
                 panel.style.right = "0px";
+                this.innerText = "&lt;";
             }
         };
         document.body.appendChild(toggleButton);

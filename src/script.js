@@ -449,7 +449,7 @@ async function ensureAddressAndSocketAccess() {
 // Send packet via the serial connection
 async function sendPacket(packet) {
     ensureAddressAndSocketAccess();
-    if (!writer) await connectSerial();
+    if (!writer) await connectAnySerial();
     try {
         const packetArray = packet.toArray();
         await writer.write(packetArray);

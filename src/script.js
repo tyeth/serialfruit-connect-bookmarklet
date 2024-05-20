@@ -317,6 +317,12 @@ async function ensureAddressAndSocketAccess() {
                         console.log('Reconnecting device');
                         let cButton = document.querySelector('button.btn-connect');
                         cButton.click();
+                        setInterval(() => {
+                            //button#web-workflow click
+                            console.log('Clicking button#web-workflow');
+                            let wButton = document.querySelector('button#web-workflow');
+                            if (wButton) wButton.click();
+                        }, 300);
                     }, 800);
                 } else {
                     console.log('Device already disconnected, new socket will be caught');

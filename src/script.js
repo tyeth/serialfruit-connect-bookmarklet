@@ -434,5 +434,3 @@ function getCurrentLocation() {
         sendLocation();
     });
 }
-
-showScreen('main-menu');

@@ -12,6 +12,7 @@
 
 import os
 import supervisor
+import sys
 import time
 
 import board
@@ -113,6 +114,9 @@ if wifi:
     print("WiFi IP Address:", wifi.radio.ipv4_address)
     print("URL: http://", wifi.radio.ipv4_address, ":" + str(os.getenv("CIRCUITPY_WEB_API_PORT", 80)), "/", sep="")
     def NewWifiData(packet=None):
+        if supervisor.runtime.serial_bytes_available:
+            print("Serial Bytes Available: ", supervisor.runtime.serial_bytes_available)
+            return True
         return False
         if wifi.radio.connected:
             return True
@@ -145,6 +149,22 @@ while True:
             # get serial from web workflow serial or via webpage/API/sockets
             red_led.value = False  # turn off red LED
             #packet = Packet.from_stream(wifi.radio)
+
+            #store bytes from serial and then create packet from it
+            try:
+                n = supervisor.runtime.serial_bytes_available
+                if n > 0:  # we read something!
+                    print("New Serial Data: ")
+                    s = sys.stdin.read(n)  # actually read it in
+                    # print both text & hex version of recv'd chars (see control chars!)
+                    print("got:", " ".join("{:s} {:02x}".format(c,ord(c)) for c in s))
+                    packet = Packet.from_bytes(s)
+            except Exception as e:
+                print("Error: ", e)
+            finally:
+                if packet is None:
+                    print("Packet decoding failed: is None")
+                    
         elif (not HAS_BLE and not HAS_WIFI and supervisor.runtime.serial_bytes_available):
             print("Serial Packet")
             # Packet is arriving.

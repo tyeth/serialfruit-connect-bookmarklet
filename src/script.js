@@ -244,13 +244,27 @@ async function connectSerial() {
 
 // Send packet via the serial connection
 async function sendPacket(packet) {
-    if (window.location.host.match(/^((192.168)|(cpy-))/i) && window.location.pathname.endsWith('cp/serial')) {
-        console.log('Sending packet:', packet);
-        debugger;
-        ws = ws || new WebSocket('ws://' + window.location.host + '/ws/serial');
-        ws.send(packet.toArray());
-        console.log('Packet sent:', packet.toArray());
-        return;
+    if (window.location.host.match(/^((192.168)|(cpy-))/i)) {
+        if (window.location.pathname.endsWith('cp/serial')) {
+            console.log('Sending packet:', packet);
+            debugger;
+            ws = ws || new WebSocket('ws://' + window.location.host + '/ws/serial');
+            ws.send(packet.toArray());
+            console.log('Packet sent:', packet.toArray());
+            return;
+        } else if (window.location.pathname == "/code/") {
+            // check if device connected state on page
+
+            // check if Serial panel is visible
+
+            // check if Serial panel is connected
+
+            // send packet
+            throw Error('CircuitPython.org support not implemented yet - try using webserial.io or the device web workflow page (at device IP or circuitpython.local)');
+        } else {
+            console.log("SerialFruit: Unsupported path:", window.location.pathname);
+            // fallback to doing connectSerial or BLE ourselves
+        }
     }
     else if (window.location.hostname.match(/code.circuitpython.org/i)) {
         // check if device connected state on page
@@ -260,7 +274,7 @@ async function sendPacket(packet) {
         // check if Serial panel is connected
 
         // send packet
-        throw NotImplementedError('Code.CircuitPython.Org support not implemented yet - try using webserial.io or the device web workflow page (at device IP or circuitpython.local)');
+        throw Error('Code.CircuitPython.Org support not implemented yet - try using webserial.io or the device web workflow page (at device IP or circuitpython.local)');
     } else if (window.location.host.match(/webserial.io/i)) {
         // check if device connected state on page
 
@@ -269,9 +283,9 @@ async function sendPacket(packet) {
         // check if Serial panel is connected
 
         // send packet
-        throw NotImplementedError('WebSerial.io support not implemented yet - try using the device web workflow page (at device IP or circuitpython.local)');
+        throw Error('WebSerial.io support not implemented yet - try using the device web workflow page (at device IP or circuitpython.local)');
     } else {
-        console.error('Unsupported host:', window.location.host);
+        console.error('SerialFruit: Unsupported host:', window.location.host);
         // fallback to doing connectSerial or BLE ourselves
     }
 

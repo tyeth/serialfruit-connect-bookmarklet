@@ -275,17 +275,19 @@ async function ensureAddressAndSocketAccess() {
             if (window.getTrackedSockets) {
                 console.log('WebSocket tracking already enabled.');
                 debugger;
-                if (window.getTrackedSockets().count(ws => ws.readyState === WebSocket.OPEN) > 1) {
-                    console.log('Unexpected MULTIPLE Existing WebSocket connections:', window.getTrackedSockets());
-                    for (const ws of window.getTrackedSockets()) {
-                        if (ws.state === WebSocket.OPEN) {
+                if (window.getTrackedSockets().length > 1) {
+                    console.log('Cleaning up old closed connections');
+                    window._trackedSockets = window._trackedSockets.filter((x) => x?.readyState !== 3);
+                    console.log('Existing Closed WebSocket connections cleaned up.');
+                    if (window.getTrackedSockets().filter(ws => ws.readyState === 1).length > 1) {
+                        console.log('Unexpected MULTIPLE Open Existing WebSocket connections:', window.getTrackedSockets());
+                        for (const ws of window.getTrackedSockets().filter((x)=>x?.readyState===1)) {
                             console.log('Closing WebSocket:', ws);
                             ws.close();
                         }
+                        console.log('Existing WebSocket connections forceably closed.');
                     }
-                    console.log('Existing WebSocket connections forceably closed.');
                     return;
-
                 }
             }
             const originalWebSocket = window.WebSocket;
@@ -304,6 +306,7 @@ async function ensureAddressAndSocketAccess() {
             window.getTrackedSockets = function () {
                 return trackedSockets;
             };
+            window._trackedSocket = trackedSockets;
 
             console.log('WebSocket tracking enabled.');
 
@@ -317,12 +320,12 @@ async function ensureAddressAndSocketAccess() {
                         console.log('Reconnecting device');
                         let cButton = document.querySelector('button.btn-connect');
                         cButton.click();
-                        setInterval(() => {
+                        setTimeout(() => {
                             //button#web-workflow click
                             console.log('Clicking button#web-workflow');
                             let wButton = document.querySelector('button#web-workflow');
                             if (wButton) wButton.click();
-                        }, 300);
+                        }, 800);
                     }, 800);
                 } else {
                     console.log('Device already disconnected, new socket will be caught');
@@ -545,3 +548,4 @@ function getCurrentLocation() {
 window.serialfruit = window.serialfruit || {};
 window.serialfruit.showScreen = showScreen;
 window.serialfruit.ensureAddressAndSocketAccess = ensureAddressAndSocketAccess;
+window.serialfruit._trackedSockets = window._trackedSockets;

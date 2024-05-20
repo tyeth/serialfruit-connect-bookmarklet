@@ -531,3 +531,7 @@ function getCurrentLocation() {
         sendLocation();
     });
 }
+
+window.serialfruit = window.serialfruit || {};
+window.serialfruit.showScreen = showScreen;
+window.serialfruit.ensureAddressAndSocketAccess = ensureAddressAndSocketAccess;

@@ -27,9 +27,9 @@
             .then(html => {
                 panel.innerHTML = html + panel.innerHTML;
                 console.log('HTML content loaded into the panel');
-                setTimeout(showScreen('main-menu'), 100);
+                setTimeout(window.serialfruit.showScreen('main-menu'), 100);
                 setTimeout(async () => {
-                    await ensureAddressAndSocketAccess();
+                    await window.serialfruit.ensureAddressAndSocketAccess();
                 }, 1000);
             })
             .catch(error => {

@@ -58,14 +58,12 @@ for file in src_files:
         continue
     with fileinput.FileInput(file, inplace=True) as f:
         for line in f:
-            print(line.replace(base_url + commit_sha_or_main + "/", base_url + new_tag + "/"), end='')
-            print(line.replace(base_url + 'main/', base_url + new_tag + "/"), end='')
+            print(line.replace(base_url + commit_sha_or_main + "/", base_url + new_tag + "/").replace(base_url + 'main/', base_url + new_tag + "/"), end='')
 
 # Repeat the process for the README file
 with fileinput.FileInput(readme_file, inplace=True) as f:
     for line in f:
-        print(line.replace(base_url + commit_sha_or_main + "/", base_url + new_tag + "/"), end='')
-        print(line.replace(base_url + 'main/', base_url + new_tag + "/"), end='')
+        print(line.replace(base_url + commit_sha_or_main + "/", base_url + new_tag + "/").replace(base_url + 'main/', base_url + new_tag + "/"), end='')
 
 # Commit the changes
 subprocess.run(['git', 'add', '.'])

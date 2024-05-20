@@ -331,6 +331,9 @@ async function ensureAddressAndSocketAccess() {
                                     cancelable: true
                                 });
                                 wButton.dispatchEvent(clickEvent);
+                                console.log('Button#web-workflow click dispatched');
+                            } else {
+                                console.error('Button#web-workflow not found - click manually');
                             }
                         }, 800);
                     }, 800);

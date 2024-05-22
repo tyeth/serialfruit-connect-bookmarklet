@@ -10,12 +10,15 @@
 #TODO: Look at https://learn.adafruit.com/crickit-flippy-robot for door lip in greenhouse
 #NOTE: Original BLE project for Crickit https://learn.adafruit.com/circuitpython-ble-crickit-rover
 
+
 import os
 import supervisor
 import sys
 import time
 
+# from board_definitions import adafruit_matrixportal_s3 as board
 import board
+
 import digitalio
 
 from adafruit_crickit import crickit
@@ -106,6 +109,30 @@ color = PURPLE  # current NeoPixel color
 prior_color = PURPLE  # to store state of previous color when changing them
 crickit.neopixel.fill(color)
 
+def check_for_waiting_serial(old_n=0):
+    n = supervisor.runtime.serial_bytes_available
+    if n - old_n > 0:  # we read something!
+        time.sleep(0.1)  # give some time to get all data - change to async
+        return check_for_waiting_serial(n)
+    return n
+def get_serial_data():
+    #store bytes from serial and then create packet from it
+    try:
+        n = check_for_waiting_serial()
+        if n > 0:  # we read something!
+            print("New Serial Data: ")
+            s = sys.stdin.read(n)  # actually read it in
+            # print both text & hex version of recv'd chars (see control chars!)
+            print("got:", " ".join("{:s} {:02x}".format(c,ord(c)) for c in s))
+            packet = Packet.from_bytes(s)
+            return packet
+    except Exception as e:
+        print("Error: ", e)
+    finally:
+        print("Packet decoding failed: is None")
+        return None
+
+
 print("WiFi/BLE Rover")
 print("Use Web Browser or Adafruit Bluefruit app to connect")
 #print mac address for BT and print IP address for WiFi
@@ -148,30 +175,14 @@ while True:
             print("WiFi Packet")
             # get serial from web workflow serial or via webpage/API/sockets
             red_led.value = False  # turn off red LED
-            #packet = Packet.from_stream(wifi.radio)
-
-            #store bytes from serial and then create packet from it
-            try:
-                n = supervisor.runtime.serial_bytes_available
-                if n > 0:  # we read something!
-                    print("New Serial Data: ")
-                    s = sys.stdin.read(n)  # actually read it in
-                    # print both text & hex version of recv'd chars (see control chars!)
-                    print("got:", " ".join("{:s} {:02x}".format(c,ord(c)) for c in s))
-                    packet = Packet.from_bytes(s)
-            except Exception as e:
-                print("Error: ", e)
-            finally:
-                if packet is None:
-                    print("Packet decoding failed: is None")
-                    
-        elif (not HAS_BLE and not HAS_WIFI and supervisor.runtime.serial_bytes_available):
-            print("Serial Packet")
+        if not packet:
+            packet = get_serial_data()
+            if packet:
+                print("Serial Packet")
+            else:
+                continue
             # Packet is arriving.
             red_led.value = False  # turn off red LED
-            packet = Packet.from_stream(supervisor.runtime.serial_bytes)
-        else:
-            continue
         if packet is not None:
             if isinstance(packet, ColorPacket):
                 # Change the color.

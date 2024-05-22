@@ -122,25 +122,25 @@ async function connectAnySerial() {
     if (writer) return;
     if (webworkflow_serial) {
         //setup textencoder for writer to websocket
-        ws = getTrackedSockets().find((ws) => ws.readyState === 1);
-        if (ws) {
+        activeWebSocket = getTrackedSockets().find((ws) => ws.readyState === 1);
+        if (activeWebSocket) {
             writer = {
                 write: async (data) => {
-                    if (!ws || ws.readyState !== 1) {
+                    if (!activeWebSocket || activeWebSocket.readyState !== 1) {
                         console.error("WebSocket not found or not connected, attempting to reget.");
                         debugger;
-                        ws = getTrackedSockets().find((ws) => ws.readyState === 1);
-                        if (!ws) {
+                        activeWebSocket = getTrackedSockets().find((ws) => ws.readyState === 1);
+                        if (!activeWebSocket) {
                             console.error("WebSocket not found or not connected.");
                             return;
                         }
-                        console.log('WebSocket refetched:', ws);
+                        console.log('WebSocket refetched:', activeWebSocket);
                     }
                     console.log('Sending packet:', data);
                     for (var i = 0; i < data.length; i++) {
                         let element = data[i];
                         console.log('Sending element:', element);
-                        ws.send(element);
+                        activeWebSocket.send(element);
                     };
                     console.log('Packet(s) sent:', data);
                 }
@@ -172,61 +172,67 @@ async function connectSerial() {
     }
 }
 
+async function ensureWebsocketsHooked() {
+    // monkey patch websockets to allow reuse
+    if (window.getTrackedSockets) {
+        console.log('WebSocket tracking already enabled.');
+        if (window.getTrackedSockets().length > 1) {
+            console.log('Cleaning up old closed connections');
+            window._trackedSockets = window._trackedSockets.filter((x) => x?.readyState !== 3);
+            console.log('Existing Closed WebSocket connections cleaned up.');
+            if (window.getTrackedSockets().filter(ws => ws.readyState === 1).length > 1) {
+                console.log('Unexpected MULTIPLE Open Existing WebSocket connections:', window.getTrackedSockets());
+                for (const ws of window.getTrackedSockets().filter((x)=>x?.readyState===1)) {
+                    console.log('Closing WebSocket:', ws);
+                    ws.close();
+                }
+                console.log('Existing WebSocket connections forceably closed.');
+            }
+            return;
+        } else if (window.getTrackedSockets().length === 1) {
+            console.log('Existing WebSocket connection found:', window.getTrackedSockets()[0]);
+            return;
+        }
+    } else {
+
+        const originalWebSocket = window.WebSocket;
+        const trackedSockets = [];
+        
+        function TrackingWebSocket(url, protocols) {
+            const ws = new originalWebSocket(url, protocols);
+            trackedSockets.push(ws);
+            console.log('WebSocket created:', ws);
+            return ws;
+        }
+
+        TrackingWebSocket.prototype = originalWebSocket.prototype;
+        window.WebSocket = TrackingWebSocket;
+        
+        window.getTrackedSockets = function () {
+            return trackedSockets;
+        };
+        window._trackedSockets = trackedSockets;
+        
+        console.log('WebSocket tracking enabled.');
+    }
+}
+
 // Ensure access to serial port and writer
 async function ensureAddressAndSocketAccess() {
     if (window.location.host.match(/^((192.168)|(cpy-))/i)) {
         webworkflow_serial = true;
         if (window.location.pathname.endsWith('cp/serial')) {
+            ensureWebsocketsHooked();
             console.log('Sending packet:', packet);
             debugger;
-            ws = ws || new WebSocket('ws://' + window.location.host + '/ws/serial');
-            ws.send(packet.toArray());
+            activeWebSocket = activeWebSocket || null;
+            debugger;
+            activeWebSocket = activeWebSocket || new WebSocket('ws://' + window.location.host + '/ws/serial');
+            activeWebSocket.send(packet.toArray());
             console.log('Packet sent:', packet.toArray());
             return;
         } else if (window.location.pathname == "/code/") {
-            // monkey patch websockets to allow reuse
-            if (window.getTrackedSockets) {
-                console.log('WebSocket tracking already enabled.');
-                debugger;
-                if (window.getTrackedSockets().length > 1) {
-                    console.log('Cleaning up old closed connections');
-                    window._trackedSockets = window._trackedSockets.filter((x) => x?.readyState !== 3);
-                    console.log('Existing Closed WebSocket connections cleaned up.');
-                    if (window.getTrackedSockets().filter(ws => ws.readyState === 1).length > 1) {
-                        console.log('Unexpected MULTIPLE Open Existing WebSocket connections:', window.getTrackedSockets());
-                        for (const ws of window.getTrackedSockets().filter((x)=>x?.readyState===1)) {
-                            console.log('Closing WebSocket:', ws);
-                            ws.close();
-                        }
-                        console.log('Existing WebSocket connections forceably closed.');
-                    }
-                    return;
-                } else if (window.getTrackedSockets().length === 1) {
-                    console.log('Existing WebSocket connection found:', window.getTrackedSockets()[0]);
-                    return;
-                }
-            } else {
-
-                const originalWebSocket = window.WebSocket;
-                const trackedSockets = [];
-                
-                function TrackingWebSocket(url, protocols) {
-                    const ws = new originalWebSocket(url, protocols);
-                    trackedSockets.push(ws);
-                    console.log('WebSocket created:', ws);
-                    return ws;
-                }
-
-                TrackingWebSocket.prototype = originalWebSocket.prototype;
-                window.WebSocket = TrackingWebSocket;
-                
-                window.getTrackedSockets = function () {
-                    return trackedSockets;
-                };
-                window._trackedSockets = trackedSockets;
-                
-                console.log('WebSocket tracking enabled.');
-            }
+            ensureWebsocketsHooked();
                 
             // check if device connected state on page and reconnect
             let connectButton = document.querySelector('button.btn-connect');
@@ -331,14 +337,31 @@ async function ensureAddressAndSocketAccess() {
         // send packet
         throw Error('Code.CircuitPython.Org support not implemented yet - try using webserial.io or the device web workflow page (at device IP or circuitpython.local)');
     } else if (window.location.host.match(/webserial.io/i)) {
+        if (window.location.queryParams && !window.location.queryParams.vid) {
+            console.error('WebSerial.io: No vid query parameter found - visit page first with a device selected');
+            alert("WebSerial.io: No vid query parameter found - visit page first with a device selected, but don't click connect yet");
+            return;
+        }
         // check if device connected state on page
-
-        // check if Serial panel is visible
-
+        if (document.querySelector('div#options').classList.contains('start')) {
+            console.log('Device not connected, connecting...');
+            ensureWebsocketsHooked();
+            document.querySelector('button#connect').click();
+        } else {
+            if (!window.serialfruit || !window.serialfruit._trackedSockets) {
+                console.error('WebSerial.io: No tracked sockets found');
+                alert('WebSerial.io: No tracked sockets found, refresh the page and activate bookmarklet again before clicking connect');
+                return;
+            }
+        }
         // check if Serial panel is connected
-
-        // send packet
-        throw Error('WebSerial.io support not implemented yet - try using the device web workflow page (at device IP or circuitpython.local)');
+        if (window.serialfruit && window.serialfruit.getTrackedSockets().filter(ws => ws.readyState === 1).length>0) {
+            console.log('WebSerial.io: Device connected and socket available');
+        } else {
+            console.error('WebSerial.io: Device not connected');
+            alert('WebSerial.io: Device not connected, connect device first');
+            return;
+        }
     } else {
         console.error('SerialFruit: Unsupported host:', window.location.host);
         // fallback to doing connectSerial or BLE ourselves

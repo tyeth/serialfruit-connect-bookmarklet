@@ -18,17 +18,17 @@ class BluefruitPacket {
     }
 
     toBytes() {
-        const length = this.payload.length + 3;
-        const checksum = this.checksum();
-        return Uint8Array.from([length, ...this.packetType.split('').map(c => c.charCodeAt(0)), ...this.payload, checksum]);
+        const partialPacket = new Uint8Array([33, ...this.packetType.split('').map(c => c.charCodeAt(0)), ...this.payload]);
+        const checksum = this.checksum(partialPacket);
+        return Uint8Array.from([...partialPacket, checksum]);
     }
 
     toArray() {
         return Array.from(this.toBytes());
     }
 
-    checksum() {
-        return this.payload.reduce((sum, value) => (sum + value) & 0xFF, 0);
+    checksum(packet) {
+        return ~packet.reduce((sum, value) => sum + value, 0) & 0xFF;
     }
 }
 

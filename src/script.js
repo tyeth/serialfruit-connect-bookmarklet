@@ -174,23 +174,23 @@ async function connectSerial() {
 
 async function ensureWebsocketsHooked() {
     // monkey patch websockets to allow reuse
-    if (window.getTrackedSockets) {
+    if (window.serialfruit.getTrackedSockets) {
         console.log('WebSocket tracking already enabled.');
-        if (window.getTrackedSockets().length > 1) {
+        if (window.serialfruit.getTrackedSockets().length > 1) {
             console.log('Cleaning up old closed connections');
-            window._trackedSockets = window._trackedSockets.filter((x) => x?.readyState !== 3);
+            window.serialfruit._trackedSockets = window.serialfruit._trackedSockets.filter((x) => x?.readyState !== 3);
             console.log('Existing Closed WebSocket connections cleaned up.');
-            if (window.getTrackedSockets().filter(ws => ws.readyState === 1).length > 1) {
+            if (window.serialfruit.getTrackedSockets().filter(ws => ws.readyState === 1).length > 1) {
                 console.log('Unexpected MULTIPLE Open Existing WebSocket connections:', window.getTrackedSockets());
-                for (const ws of window.getTrackedSockets().filter((x)=>x?.readyState===1)) {
+                for (const ws of window.serialfruit.getTrackedSockets().filter((x)=>x?.readyState===1)) {
                     console.log('Closing WebSocket:', ws);
                     ws.close();
                 }
                 console.log('Existing WebSocket connections forceably closed.');
             }
             return;
-        } else if (window.getTrackedSockets().length === 1) {
-            console.log('Existing WebSocket connection found:', window.getTrackedSockets()[0]);
+        } else if (window.serialfruit.getTrackedSockets().length === 1) {
+            console.log('Existing WebSocket connection found:', window.serialfruit.getTrackedSockets()[0]);
             return;
         }
     } else {
@@ -208,10 +208,10 @@ async function ensureWebsocketsHooked() {
         TrackingWebSocket.prototype = originalWebSocket.prototype;
         window.WebSocket = TrackingWebSocket;
         
-        window.getTrackedSockets = function () {
+        window.serialfruit.getTrackedSockets = function () {
             return trackedSockets;
         };
-        window._trackedSockets = trackedSockets;
+        window.serialfruit._trackedSockets = trackedSockets;
         
         console.log('WebSocket tracking enabled.');
     }
@@ -529,4 +529,4 @@ function getCurrentLocation() {
 window.serialfruit = window.serialfruit || {};
 window.serialfruit.showScreen = showScreen;
 window.serialfruit.ensureAddressAndSocketAccess = ensureAddressAndSocketAccess;
-window.serialfruit._trackedSockets = window._trackedSockets;
+window.serialfruit._trackedSockets = [];

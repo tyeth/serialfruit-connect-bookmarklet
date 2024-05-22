@@ -33,13 +33,13 @@ _If you have problems then try a Chromium based web browser (e.g., Chrome, Edge)
 
 See `./examples` folder for a Crickit based project that previously required bluetooth
 
-Next is a link to the bookmarklet code which you can right click <a href="javascript:(function(){var script=document.createElement('script');script.src='https://cdn.jsdelivr.net/gh/tyeth/serialfruit-connect@v0.0.46/src/bookmarklet.js';document.body.appendChild(script);})();">HERE</a> and choose add to favourites/bookmark,
+Next is a link to the bookmarklet code which you can right click <a href="javascript:(function(){var script=document.createElement('script');script.src='https://cdn.jsdelivr.net/gh/tyeth/serialfruit-connect@v0.0.47/src/bookmarklet.js';document.body.appendChild(script);})();">HERE</a> and choose add to favourites/bookmark,
 
 Or the bookmarklet code to copy and paste into address bar: 
 ```
 javascript:(function() {
     var script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/gh/tyeth/serialfruit-connect@v0.0.46/src/bookmarklet.js';
+    script.src = 'https://cdn.jsdelivr.net/gh/tyeth/serialfruit-connect@v0.0.47/src/bookmarklet.js';
     document.body.appendChild(script);
 })();
 ```

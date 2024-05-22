@@ -128,9 +128,10 @@ async function connectAnySerial() {
                 write: async (data) => {
                     if (!activeWebSocket || activeWebSocket.readyState !== 1) {
                         console.error("WebSocket not found or not connected, attempting to reget.");
-                        debugger;
                         activeWebSocket = window.serialfruit.getTrackedSockets().find((ws) => ws.readyState === 1);
                         if (!activeWebSocket) {
+                            console.debug('WebSocket refetch failed:', window.serialfruit.getTrackedSockets());
+                            debugger;
                             console.error("WebSocket not found or not connected.");
                             return;
                         }
@@ -229,7 +230,6 @@ async function ensureAddressAndSocketAccess() {
             console.log('Sending packet:', packet);
             debugger;
             activeWebSocket = activeWebSocket || null;
-            debugger;
             activeWebSocket = activeWebSocket || new WebSocket('ws://' + window.location.host + '/ws/serial');
             activeWebSocket.send(packet.toArray());
             console.log('Packet sent:', packet.toArray());
@@ -263,7 +263,6 @@ async function ensureAddressAndSocketAccess() {
                                 });
                                 wModal.dispatchEvent(focusInEvent);
                                 console.log('FocusIn event dispatched on modal');
-                                debugger;
                                 let wButton = document.querySelector('button#web-workflow');
                                 if (wButton){
                                     let focusInEvent = new FocusEvent('focusin', {

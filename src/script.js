@@ -122,14 +122,14 @@ async function connectAnySerial() {
     if (writer) return;
     if (webworkflow_serial || web_usb_serial) {
         //setup textencoder for writer to websocket
-        activeWebSocket = getTrackedSockets().find((ws) => ws.readyState === 1);
+        activeWebSocket = window.serialfruit.getTrackedSockets().find((ws) => ws.readyState === 1);
         if (activeWebSocket) {
             writer = {
                 write: async (data) => {
                     if (!activeWebSocket || activeWebSocket.readyState !== 1) {
                         console.error("WebSocket not found or not connected, attempting to reget.");
                         debugger;
-                        activeWebSocket = getTrackedSockets().find((ws) => ws.readyState === 1);
+                        activeWebSocket = window.serialfruit.getTrackedSockets().find((ws) => ws.readyState === 1);
                         if (!activeWebSocket) {
                             console.error("WebSocket not found or not connected.");
                             return;
@@ -178,10 +178,10 @@ async function ensureWebsocketsHooked() {
         console.log('WebSocket tracking already enabled.');
         if (window.serialfruit.getTrackedSockets().length > 1) {
             console.log('Cleaning up old closed connections');
-            window.serialfruit._trackedSockets = window.serialfruit._trackedSockets.filter((x) => x?.readyState !== 3);
+            window.serialfruit.cleanTrackedSockets();
             console.log('Existing Closed WebSocket connections cleaned up.');
             if (window.serialfruit.getTrackedSockets().filter(ws => ws.readyState === 1).length > 1) {
-                console.log('Unexpected MULTIPLE Open Existing WebSocket connections:', window.getTrackedSockets());
+                console.log('Unexpected MULTIPLE Open Existing WebSocket connections:', window.serialfruit.getTrackedSockets());
                 for (const ws of window.serialfruit.getTrackedSockets().filter((x)=>x?.readyState===1)) {
                     console.log('Closing WebSocket:', ws);
                     ws.close();
@@ -210,6 +210,9 @@ async function ensureWebsocketsHooked() {
         
         window.serialfruit.getTrackedSockets = function () {
             return trackedSockets;
+        };
+        window.serialfruit.cleanTrackedSockets = function () {
+            trackedSockets = trackedSockets.filter((x) => x?.readyState !== 3);
         };
         window.serialfruit._trackedSockets = trackedSockets;
         

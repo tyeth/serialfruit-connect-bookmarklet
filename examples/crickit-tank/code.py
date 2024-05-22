@@ -115,8 +115,10 @@ def check_for_waiting_serial(old_n=0):
         time.sleep(0.1)  # give some time to get all data - change to async
         return check_for_waiting_serial(n)
     return n
+
 def get_serial_data():
     #store bytes from serial and then create packet from it
+    s=None
     try:
         n = check_for_waiting_serial()
         if n > 0:  # we read something!
@@ -130,6 +132,13 @@ def get_serial_data():
         print("Error: ", e)
         print("Packet decoding failed: is None")
     finally:
+        if s==b'\x04': #ctrl-d
+            print("Ctrl-D received, rebooting / exiting in 3 seconds")
+            time.sleep(3)
+            if hasattr(supervisor, "reload"):
+                supervisor.reload()
+            else:
+                sys.exit()
         return None
 
 

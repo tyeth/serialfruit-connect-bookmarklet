@@ -346,7 +346,7 @@ async function ensureAddressAndSocketAccess() {
         if (document.querySelector('div#options').classList.contains('start')) {
             console.log('Device not connected, connecting...');
             ensureWebsocketsHooked();
-            document.querySelector('button#connect').click();
+            document.querySelector('#options > fieldset > button').click();
         } else {
             if (!window.serialfruit || !window.serialfruit._trackedSockets) {
                 console.error('WebSerial.io: No tracked sockets found');

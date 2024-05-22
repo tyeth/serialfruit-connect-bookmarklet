@@ -355,13 +355,6 @@ async function ensureAddressAndSocketAccess() {
             }
         }
         // check if Serial panel is connected
-        if (window.serialfruit && window.serialfruit.getTrackedSockets().filter(ws => ws.readyState === 1).length>0) {
-            console.log('WebSerial.io: Device connected and socket available');
-        } else {
-            console.error('WebSerial.io: Device not connected');
-            alert('WebSerial.io: Device not connected, connect device first');
-            return;
-        }
     } else {
         console.error('SerialFruit: Unsupported host:', window.location.host);
         // fallback to doing connectSerial or BLE ourselves

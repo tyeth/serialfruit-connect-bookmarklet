@@ -128,8 +128,8 @@ def get_serial_data():
             return packet
     except Exception as e:
         print("Error: ", e)
-    finally:
         print("Packet decoding failed: is None")
+    finally:
         return None
 
 
@@ -149,6 +149,7 @@ if wifi:
             return True
         else:
             return False
+
 if HAS_BLE:
     print("BLE MAC Address:", [hex(i) for i in ble.address_bytes])
 

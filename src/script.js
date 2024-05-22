@@ -115,12 +115,12 @@ class TemperaturePacket extends BluefruitPacket {
 }
 
 // Initialize global variables for serial port and writer
-let port, writer, webworkflow_serial, ble_serial, accelerometerEnabled = false;
+let port, writer, webworkflow_serial, ble_serial, web_usb_serial, accelerometerEnabled = false;
 
 // Connect to serial or web serial (or eventually BLE serial)
 async function connectAnySerial() {
     if (writer) return;
-    if (webworkflow_serial) {
+    if (webworkflow_serial || web_usb_serial) {
         //setup textencoder for writer to websocket
         activeWebSocket = getTrackedSockets().find((ws) => ws.readyState === 1);
         if (activeWebSocket) {
@@ -342,6 +342,7 @@ async function ensureAddressAndSocketAccess() {
             alert("WebSerial.io: No vid query parameter found - visit page first with a device selected, but don't click connect yet");
             return;
         }
+        web_usb_serial = true;
         // check if device connected state on page
         if (document.querySelector('div#options').classList.contains('start')) {
             console.log('Device not connected, connecting...');

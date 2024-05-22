@@ -239,7 +239,8 @@ async function ensureAddressAndSocketAccess() {
                 ensureWebsocketsHooked();
             
                 // check if device connected state on page and reconnect
-                let connectButton = document.querySelectorAll('button.btn-connect').filter((x) => x.offsetHeight !== 0);
+                let connectButton = document.querySelectorAll('button.btn-connect')
+                connectButton = Array.prototype.filter((x) => x.offsetHeight !== 0, connectButton);
                 connectButton = Object.prototype.hasOwnProperty("length", connectButton) && connectButton.length > 1 ? connectButton[0] : connectButton;
                 if (connectButton) {
                     if (connectButton.textContent === 'Disconnect') {

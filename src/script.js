@@ -18,7 +18,7 @@ class BluefruitPacket {
     }
 
     toBytes() {
-        const partialPacket = new Uint8Array([33, ...this.packetType.split('').map(c => c.charCodeAt(0)), ...this.payload]);
+        const partialPacket = new Uint8Array([ ...this.packetType.split('').map(c => c.charCodeAt(0)), ...this.payload]);
         const checksum = this.checksum(partialPacket);
         return Uint8Array.from([...partialPacket, checksum]);
     }

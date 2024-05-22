@@ -112,7 +112,7 @@ crickit.neopixel.fill(color)
 def check_for_waiting_serial(old_n=0):
     n = supervisor.runtime.serial_bytes_available
     if n - old_n > 0:  # we read something!
-        time.sleep(0.1)  # give some time to get all data - change to async
+        time.sleep(0.05)  # give some time to get all data - change to async
         return check_for_waiting_serial(n)
     return n
 
@@ -123,9 +123,11 @@ def get_serial_data():
         n = check_for_waiting_serial()
         if n > 0:  # we read something!
             print("New Serial Data: ")
+            # packet = Packet.from_stream(sys.stdin)
+            # print("Packet: ", packet)
             s = sys.stdin.read(n)  # actually read it in
             # print both text & hex version of recv'd chars (see control chars!)
-            print("got:", " ".join("{:s} {:02x}".format(c,ord(c)) for c in s))
+            print("got:", ", ".join("{:s} ({:02x})".format(c,ord(c)) for c in s))
             packet = Packet.from_bytes(s)
             return packet
     except Exception as e:

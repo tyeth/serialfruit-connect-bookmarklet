@@ -139,11 +139,7 @@ async function connectAnySerial() {
                         console.log('WebSocket refetched:', activeWebSocket);
                     }
                     console.log('Sending packet:', data);
-                    for (var i = 0; i < data.length; i++) {
-                        let element = data[i];
-                        console.log('Sending element:', element);
-                        activeWebSocket.send(element);
-                    };
+                    activeWebSocket.send(data);
                     console.log('Packet(s) sent:', data);
                 }
             };

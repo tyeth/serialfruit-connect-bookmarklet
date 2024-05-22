@@ -131,15 +131,14 @@ def get_serial_data():
     except Exception as e:
         print("Error: ", e)
         print("Packet decoding failed: is None")
-    finally:
-        if s==b'\x04': #ctrl-d
-            print("Ctrl-D received, rebooting / exiting in 3 seconds")
-            time.sleep(3)
-            if hasattr(supervisor, "reload"):
-                supervisor.reload()
-            else:
-                sys.exit()
-        return None
+    if s==b'\x04': #ctrl-d
+        print("Ctrl-D received, rebooting / exiting in 3 seconds")
+        time.sleep(3)
+        if hasattr(supervisor, "reload"):
+            supervisor.reload()
+        else:
+            sys.exit()
+    return None
 
 
 print("WiFi/BLE Rover")

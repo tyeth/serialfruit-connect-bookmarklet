@@ -126,6 +126,7 @@ async function connectAnySerial() {
         if (activeWebSocket) {
             writer = {
                 write: async (data) => {
+                    console.debug('Attempting to send packet after fetching websocket:', data);
                     if (!activeWebSocket || activeWebSocket.readyState !== 1) {
                         console.error("WebSocket not found or not connected, attempting to reget.");
                         activeWebSocket = window.serialfruit.getTrackedSockets().find((ws) => ws.readyState === 1);

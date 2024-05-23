@@ -139,7 +139,7 @@ async function connectAnySerial() {
                         console.log('WebSocket refetched:', activeWebSocket);
                     }
                     console.log('Sending packet:', data);
-                    activeWebSocket.send(data);
+                    activeWebSocket.send(new Uint8Array(data));
                     console.log('Packet(s) sent:', data);
                 }
             };
@@ -224,12 +224,12 @@ async function ensureAddressAndSocketAccess() {
         webworkflow_serial = true;
         if (window.location.pathname.endsWith('cp/serial')) {
             ensureWebsocketsHooked();
-            console.log('Sending packet:', packet);
             debugger;
             activeWebSocket = activeWebSocket || null;
             activeWebSocket = activeWebSocket || new WebSocket('ws://' + window.location.host + '/ws/serial');
-            activeWebSocket.send(packet.toArray());
-            console.log('Packet sent:', packet.toArray());
+            // console.log('Sending packet:', packet);
+            // activeWebSocket.send(packet.toArray());
+            // console.log('Packet sent:', packet.toArray());
             return;
         } else if (window.location.pathname == "/code/") {
             if (!window.serialfruit?.getTrackedSockets) {
@@ -238,6 +238,7 @@ async function ensureAddressAndSocketAccess() {
                 // check if device connected state on page and reconnect
                 let connectButton = document.querySelectorAll('button.btn-connect')
                 connectButton = Array.prototype.filter((x) => x.offsetHeight !== 0, connectButton);
+                print('Filtered Connect buttons:', connectButton);
                 connectButton = Object.prototype.hasOwnProperty("length", connectButton) && connectButton.length > 1 ? connectButton[0] : connectButton;
                 if (connectButton) {
                     if (connectButton.textContent === 'Disconnect') {

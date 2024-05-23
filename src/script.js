@@ -139,7 +139,8 @@ async function connectAnySerial() {
                         console.log('WebSocket refetched:', activeWebSocket);
                     }
                     console.log('Sending packet:', data);
-                    activeWebSocket.send(new Uint8Array(data));
+                    // circuirpython websocket uses text based comms
+                    activeWebSocket.send(new TextDecoder().decode(data));
                     console.log('Packet(s) sent:', data);
                 }
             };

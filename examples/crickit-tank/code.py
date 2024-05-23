@@ -125,7 +125,7 @@ def get_serial_data():
             print("New Serial Data: ")
             # packet = Packet.from_stream(sys.stdin)
             # print("Packet: ", packet)
-            s = sys.stdin.read(n)  # actually read it in
+            s = sys.stdin.read(6)  # actually read it in
             # print both text & hex version of recv'd chars (see control chars!)
             print("got:", ", ".join("{:s} ({:02x})".format(c,ord(c)) for c in s))
             packet = Packet.from_bytes(s)
@@ -152,7 +152,7 @@ if wifi:
     print("URL: http://", wifi.radio.ipv4_address, ":" + str(os.getenv("CIRCUITPY_WEB_API_PORT", 80)), "/", sep="")
     def NewWifiData(packet=None):
         if supervisor.runtime.serial_bytes_available:
-            print("Serial Bytes Available: ", supervisor.runtime.serial_bytes_available)
+            print("New WiFi Data Check: Serial Bytes Available: ", supervisor.runtime.serial_bytes_available)
             return True
         return False
         if wifi.radio.connected:

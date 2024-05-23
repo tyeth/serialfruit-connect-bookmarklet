@@ -236,18 +236,18 @@ async function ensureAddressAndSocketAccess() {
                 ensureWebsocketsHooked();
             
                 // check if device connected state on page and reconnect
-                let connectButton = document.querySelectorAll('button.btn-connect')
-                connectButton = Array.prototype.filter((x) => x.offsetHeight !== 0, connectButton);
-                print('Filtered Connect buttons:', connectButton);
-                connectButton = Object.prototype.hasOwnProperty("length", connectButton) && connectButton.length > 1 ? connectButton[0] : connectButton;
+                let connectButton = [...document.querySelectorAll('button.btn-connect')];
+                connectButton = connectButton.filter((x) => x.offsetHeight !== 0);
+                connectButton = connectButton.length > 1 ? connectButton[0] : connectButton;
                 if (connectButton) {
                     if (connectButton.textContent === 'Disconnect') {
                         console.log('Device already connected, disconnecting first');
                         connectButton.click();
                         setTimeout(() => {
                             console.log('Reconnecting device');
-                            let cButton = document.querySelector('button.btn-connect');
-                            cButton = Object.prototype.hasOwnProperty("length", cButton) && cButton.length > 1 ? cButton[0] : cButton;
+                            let cButton = [...document.querySelectorAll('button.btn-connect')];
+                            cButton = cButton.filter((x) => x.offsetHeight !== 0);
+                            cButton = cButton.length > 1 ? cButton[0] : cButton;
                             cButton.click();
                             setTimeout(() => {
                                 //button#web-workflow click

@@ -130,7 +130,7 @@ def check_for_waiting_serial(old_n=0):
 
 def get_serial_data(should_convert_slash_x_strings=False):
     #store bytes from serial and then create packet from it
-    s=None
+    s=''
     while supervisor.runtime.serial_bytes_available:
         try:
             n = check_for_waiting_serial()
@@ -138,8 +138,9 @@ def get_serial_data(should_convert_slash_x_strings=False):
                 print("New Serial Data: ",n)
                 # packet = Packet.from_stream(sys.stdin)
                 # print("Packet: ", packet)
-                s = sys.stdin.read(n)  # actually read it in
-                
+                # s = input()  # read a line from the serial input
+                s = sys.stdin.read()  # actually read it in - don't pass n as seemed wrong for web workflow
+                print(f"Read {n} bytes: {s}")
                 # convert \xXX from incoming string, e.g. '!C\x20\x20\x20;' = b'!C   ;' (end up convert whole string to bytes)
                 if should_convert_slash_x_strings:
                     s = convert_slashXstrings(s)
@@ -181,6 +182,7 @@ if wifi:
             print("Serial Bytes Available: ", supervisor.runtime.serial_bytes_available)
             print("Web serial data comes as text, attempting to force decode:")
             passed_packet = get_serial_data(should_convert_slash_x_strings=True)
+            print("Web Packet: ", passed_packet)
             return True
         return False
         # if wifi.radio.connected:
@@ -215,7 +217,7 @@ while True:
             # get serial from web workflow serial or via webpage/API/sockets
             red_led.value = False  # turn off red LED
         if not packet:
-            packet = get_serial_data()
+            packet = get_serial_data(should_convert_slash_x_strings=False)
             if packet:
                 print("Serial Packet")
             else:

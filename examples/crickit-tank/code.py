@@ -10,7 +10,7 @@
 #TODO: Look at https://learn.adafruit.com/crickit-flippy-robot for door lip in greenhouse
 #NOTE: Original BLE project for Crickit https://learn.adafruit.com/circuitpython-ble-crickit-rover
 
-DEBUG=False
+DEBUG = True
 
 import os
 import re
@@ -142,14 +142,13 @@ def get_serial_data(should_convert_slash_x_strings=False):
                 # s = input()  # read a line from the serial input
                 while supervisor.runtime.serial_bytes_available:
                     s+= sys.stdin.read(1)  # actually read it in - don't pass n as seemed wrong for web workflow
-                print(f"Read {n} bytes: ", s)
+                print(f"Asked to read {n} bytes, got {len(s)} bytes: '", s, "'", sep="")
                 # convert \xXX from incoming string, e.g. '!C\x20\x20\x20;' = b'!C   ;' (end up convert whole string to bytes)
                 if should_convert_slash_x_strings:
                     s = convert_slashXstrings(s)
                     print("Converted: ", s)
 
                 # print both text & hex version of recv'd chars (see control chars!)
-                print("got:", ", ".join("{:s} ({:02d}=\\x{:02x})".format(c,ord(c),ord(c)) for c in s))
                 print("S:",s)
                 print("S-utf-8-bytes",bytes(s, 'utf-8'))
         except Exception as e:
@@ -186,8 +185,8 @@ if wifi:
             print("Web serial data comes as text, attempting to force decode:")
             passed_packet = get_serial_data(should_convert_slash_x_strings=True)
             print("Web Packet: ", passed_packet)
-            return True
-        return False
+            return passed_packet
+        return None
         # if wifi.radio.connected:
         #     return True
         # else:
@@ -210,82 +209,90 @@ while True:
                 break
     while (HAS_BLE and ble.connected) or (HAS_WIFI and wifi.radio.connected) or \
         (supervisor.runtime.serial_connected):
-        packet = None
+        PACKET = None
         if (HAS_BLE and uart_service.in_waiting):
             print("BLE Packet")
             # Packet is arriving.
             red_led.value = False  # turn off red LED
-            packet = Packet.from_stream(uart_service)
-        elif (HAS_WIFI and new_wifi_data_packet(packet)):
-            print("WiFi Packet")
-            # get serial from web workflow serial or via webpage/API/sockets
-            red_led.value = False  # turn off red LED
-        if not packet:
-            if DEBUG: print("No packet from BLE or WiFi, final check of Serial")
-            packet = get_serial_data(should_convert_slash_x_strings=False)
-            if packet:
-                print("Final check for Serial Packet successful: ", packet)
+            PACKET = Packet.from_stream(uart_service)
+        elif HAS_WIFI:
+            PACKET=new_wifi_data_packet(PACKET)
+            if PACKET:
+                DEBUG = False
+                print("WiFi Packet Received!", PACKET)
+                # get serial from web workflow serial or via webpage/API/sockets
+                red_led.value = False  # turn off red LED
+        if not PACKET and supervisor.runtime.serial_bytes_available:
+            if DEBUG:
+                print("No packet from BLE or WiFi, but Serial Bytes Available: ", supervisor.runtime.serial_bytes_available)
+            PACKET = get_serial_data(should_convert_slash_x_strings=False)
+            if PACKET:
+                print("Final check for Serial Packet successful: ", PACKET)
             else:
                 continue
             # Packet is arriving.
             red_led.value = False  # turn off red LED
-        if packet is not None:
-            print("Valid Packet: ", packet)
-            if isinstance(packet, ColorPacket):
+        if PACKET is not None:
+            print("Valid Packet: ", PACKET)
+            DEBUG = False
+            if isinstance(PACKET, ColorPacket):
                 # Change the color.
-                print("Color Packet: ", packet.color)
-                color = packet.color
+                print("Color Packet: ", PACKET.color)
+                color = PACKET.color
                 crickit.neopixel.fill(color)
 
             # do this when buttons are pressed
-            if isinstance(packet, ButtonPacket) and packet.pressed:
+            if isinstance(PACKET, ButtonPacket) and PACKET.pressed:
                 red_led.value = True  # blink to show a packet has been received
-                if packet.button == ButtonPacket.UP:  # UP button pressed
+                if PACKET.button == ButtonPacket.UP:  # UP button pressed
                     crickit.neopixel.fill(color)
                     motor_1.throttle = FWD
                     motor_2.throttle = FWD
-                elif packet.button == ButtonPacket.DOWN:  # DOWN button
+                elif PACKET.button == ButtonPacket.DOWN:  # DOWN button
                     crickit.neopixel.fill(color)
                     motor_1.throttle = REV
                     motor_2.throttle = REV
-                elif packet.button == ButtonPacket.RIGHT:
+                elif PACKET.button == ButtonPacket.RIGHT:
                     prior_color = color
                     color = YELLOW
                     crickit.neopixel.fill(color)
                     motor_1.throttle = FWD
                     motor_2.throttle = FWD * 0.5
-                elif packet.button == ButtonPacket.LEFT:
+                elif PACKET.button == ButtonPacket.LEFT:
                     prior_color = color
                     color = YELLOW
                     crickit.neopixel.fill(color)
                     motor_1.throttle = FWD * 0.5
                     motor_2.throttle = FWD
-                elif packet.button == ButtonPacket.BUTTON_1:
+                elif PACKET.button == ButtonPacket.BUTTON_1:
                     crickit.neopixel.fill(RED)
                     motor_1.throttle = 0.0
                     motor_2.throttle = 0.0
                     time.sleep(0.5)
                     crickit.neopixel.fill(color)
-                elif packet.button == ButtonPacket.BUTTON_2:
+                elif PACKET.button == ButtonPacket.BUTTON_2:
                     color = GREEN
                     crickit.neopixel.fill(color)
-                elif packet.button == ButtonPacket.BUTTON_3:
+                elif PACKET.button == ButtonPacket.BUTTON_3:
                     color = BLUE
                     crickit.neopixel.fill(color)
-                elif packet.button == ButtonPacket.BUTTON_4:
+                elif PACKET.button == ButtonPacket.BUTTON_4:
                     color = PURPLE
                     crickit.neopixel.fill(color)
             # do this when some buttons are released
-            elif isinstance(packet, ButtonPacket) and not packet.pressed:
-                if packet.button == ButtonPacket.RIGHT:
+            elif isinstance(PACKET, ButtonPacket) and not PACKET.pressed:
+                if PACKET.button == ButtonPacket.RIGHT:
                     print("released right")
                     color = prior_color
                     crickit.neopixel.fill(color)
                     motor_1.throttle = FWD
                     motor_2.throttle = FWD
-                if packet.button == ButtonPacket.LEFT:
+                if PACKET.button == ButtonPacket.LEFT:
                     print("released left")
                     color = prior_color
                     crickit.neopixel.fill(color)
                     motor_1.throttle = FWD
                     motor_2.throttle = FWD
+        else:
+            if DEBUG:
+                print("No packet received")

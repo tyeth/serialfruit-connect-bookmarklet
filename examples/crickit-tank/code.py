@@ -139,7 +139,7 @@ def get_serial_data(should_convert_slash_x_strings=False):
                 # packet = Packet.from_stream(sys.stdin)
                 # print("Packet: ", packet)
                 # s = input()  # read a line from the serial input
-                s = sys.stdin.read()  # actually read it in - don't pass n as seemed wrong for web workflow
+                s = sys.stdin.read(n)  # actually read it in - don't pass n as seemed wrong for web workflow
                 print(f"Read {n} bytes: {s}")
                 # convert \xXX from incoming string, e.g. '!C\x20\x20\x20;' = b'!C   ;' (end up convert whole string to bytes)
                 if should_convert_slash_x_strings:

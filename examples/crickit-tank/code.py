@@ -10,6 +10,7 @@
 #TODO: Look at https://learn.adafruit.com/crickit-flippy-robot for door lip in greenhouse
 #NOTE: Original BLE project for Crickit https://learn.adafruit.com/circuitpython-ble-crickit-rover
 
+DEBUG=False
 
 import os
 import re
@@ -139,8 +140,9 @@ def get_serial_data(should_convert_slash_x_strings=False):
                 # packet = Packet.from_stream(sys.stdin)
                 # print("Packet: ", packet)
                 # s = input()  # read a line from the serial input
-                s = sys.stdin.read(n)  # actually read it in - don't pass n as seemed wrong for web workflow
-                print(f"Read {n} bytes: {s}")
+                while supervisor.runtime.serial_bytes_available:
+                    s+= sys.stdin.read(1)  # actually read it in - don't pass n as seemed wrong for web workflow
+                print(f"Read {n} bytes: ", s)
                 # convert \xXX from incoming string, e.g. '!C\x20\x20\x20;' = b'!C   ;' (end up convert whole string to bytes)
                 if should_convert_slash_x_strings:
                     s = convert_slashXstrings(s)
@@ -148,8 +150,8 @@ def get_serial_data(should_convert_slash_x_strings=False):
 
                 # print both text & hex version of recv'd chars (see control chars!)
                 print("got:", ", ".join("{:s} ({:02d}=\\x{:02x})".format(c,ord(c),ord(c)) for c in s))
-                print(s)
-                print(bytes(s, 'utf-8'))
+                print("S:",s)
+                print("S-utf-8-bytes",bytes(s, 'utf-8'))
         except Exception as e:
             print("Error: ", e)
         
@@ -163,6 +165,7 @@ def get_serial_data(should_convert_slash_x_strings=False):
     if s:
         try:
             decoded_packet = Packet.from_bytes(s)
+            print("Decoded Packet: ", decoded_packet)
             return decoded_packet
         except ValueError as e:
             print("Error: ", e)
@@ -205,7 +208,8 @@ while True:
             if ble.connected:
                 blue_led.value = True  # turn on blue LED when connected
                 break
-    while (HAS_BLE and ble.connected) or (HAS_WIFI and wifi.radio.connected) or (not HAS_BLE and not HAS_WIFI and supervisor.runtime.serial_connected):
+    while (HAS_BLE and ble.connected) or (HAS_WIFI and wifi.radio.connected) or \
+        (supervisor.runtime.serial_connected):
         packet = None
         if (HAS_BLE and uart_service.in_waiting):
             print("BLE Packet")
@@ -217,14 +221,16 @@ while True:
             # get serial from web workflow serial or via webpage/API/sockets
             red_led.value = False  # turn off red LED
         if not packet:
+            if DEBUG: print("No packet from BLE or WiFi, final check of Serial")
             packet = get_serial_data(should_convert_slash_x_strings=False)
             if packet:
-                print("Serial Packet")
+                print("Final check for Serial Packet successful: ", packet)
             else:
                 continue
             # Packet is arriving.
             red_led.value = False  # turn off red LED
         if packet is not None:
+            print("Valid Packet: ", packet)
             if isinstance(packet, ColorPacket):
                 # Change the color.
                 print("Color Packet: ", packet.color)

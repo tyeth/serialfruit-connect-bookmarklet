@@ -12,6 +12,7 @@
 
 
 import os
+import re
 import supervisor
 import sys
 import time
@@ -32,11 +33,10 @@ try:
     from adafruit_ble.advertising.standard import ProvideServicesAdvertisement
     from adafruit_ble.services.nordic import UARTService
     HAS_BLE = True
-except ImportError as e:
-    if "bleio" in str(e):
+except ImportError as ie:
+    if "bleio" in str(ie):
         logError(ImportError("This example does not work with the 'bleio' library. Please use 'adafruit_ble' and some external bluetooth daughter-board."))
     HAS_BLE = False
-    pass
 
 # Import the packet classes that will be used.
 from adafruit_bluefruit_connect.packet import Packet
@@ -81,8 +81,8 @@ elif board.board_id == "adafruit_feather_esp32s2_tft":
 try:
     import wifi
     HAS_WIFI = True
-except ImportError as e:
-    if "wifi" in str(e):
+except ImportError as ie:
+    if "wifi" in str(ie):
         logError(ImportError("This example does not work with the 'wifi' library. Please use 'adafruit_esp32spi' or 'adafruit_esp32spi_socket'."))
     HAS_WIFI = False
 
@@ -109,37 +109,63 @@ color = PURPLE  # current NeoPixel color
 prior_color = PURPLE  # to store state of previous color when changing them
 crickit.neopixel.fill(color)
 
+def convert_slashXstrings(input_string=''):
+    result_bytes = bytearray()
+    i = 0
+    while i < len(input_string):
+        if re.match(f'\\x[a-fA-F0-9]{2}', input_string[i:i+4]):
+            result_bytes.extend(bytes.fromhex(input_string[i+2:i+4]))
+            i += 4
+        else:
+            result_bytes.append(ord(input_string[i]))
+            i += 1
+    return bytes(result_bytes)
+
 def check_for_waiting_serial(old_n=0):
     n = supervisor.runtime.serial_bytes_available
-    if n - old_n > 0:  # we read something!
-        time.sleep(0.05)  # give some time to get all data - change to async
-        return check_for_waiting_serial(n)
+    # if n - old_n > 0:  # we read something extra!
+    #     time.sleep(0.01)  # give some time to get all data - change to async
+    #     return check_for_waiting_serial(n)
     return n
 
-def get_serial_data():
+def get_serial_data(should_convert_slash_x_strings=False):
     #store bytes from serial and then create packet from it
     s=None
-    try:
-        n = check_for_waiting_serial()
-        if n > 0:  # we read something!
-            print("New Serial Data: ")
-            # packet = Packet.from_stream(sys.stdin)
-            # print("Packet: ", packet)
-            s = sys.stdin.read(6)  # actually read it in
-            # print both text & hex version of recv'd chars (see control chars!)
-            print("got:", ", ".join("{:s} ({:02x})".format(c,ord(c)) for c in s))
-            packet = Packet.from_bytes(s)
-            return packet
-    except Exception as e:
-        print("Error: ", e)
-        print("Packet decoding failed: is None")
-    if s==b'\x04': #ctrl-d
-        print("Ctrl-D received, rebooting / exiting in 3 seconds")
-        time.sleep(3)
-        if hasattr(supervisor, "reload"):
-            supervisor.reload()
-        else:
-            sys.exit()
+    while supervisor.runtime.serial_bytes_available:
+        try:
+            n = check_for_waiting_serial()
+            if n > 0:  # we read something!
+                print("New Serial Data: ",n)
+                # packet = Packet.from_stream(sys.stdin)
+                # print("Packet: ", packet)
+                s = sys.stdin.read(n)  # actually read it in
+                
+                # convert \xXX from incoming string, e.g. '!C\x20\x20\x20;' = b'!C   ;' (end up convert whole string to bytes)
+                if should_convert_slash_x_strings:
+                    s = convert_slashXstrings(s)
+                    print("Converted: ", s)
+
+                # print both text & hex version of recv'd chars (see control chars!)
+                print("got:", ", ".join("{:s} ({:02d}=\\x{:02x})".format(c,ord(c),ord(c)) for c in s))
+                print(s)
+                print(bytes(s, 'utf-8'))
+        except Exception as e:
+            print("Error: ", e)
+        
+        if s==b'\x04': #ctrl-d
+            print("Ctrl-D received, rebooting / exiting in 3 seconds")
+            time.sleep(3)
+            if hasattr(supervisor, "reload"):
+                supervisor.reload()
+            else:
+                sys.exit()
+    if s:
+        try:
+            decoded_packet = Packet.from_bytes(s)
+            return decoded_packet
+        except ValueError as e:
+            print("Error: ", e)
+            print("Packet decoding failed: is None")
     return None
 
 
@@ -150,15 +176,17 @@ if wifi:
     print("WiFi MAC Address:", [hex(i) for i in wifi.radio.mac_address])
     print("WiFi IP Address:", wifi.radio.ipv4_address)
     print("URL: http://", wifi.radio.ipv4_address, ":" + str(os.getenv("CIRCUITPY_WEB_API_PORT", 80)), "/", sep="")
-    def NewWifiData(packet=None):
+    def new_wifi_data_packet(passed_packet):  # pylint: disable=unused-argument
         if supervisor.runtime.serial_bytes_available:
-            print("New WiFi Data Check: Serial Bytes Available: ", supervisor.runtime.serial_bytes_available)
+            print("Serial Bytes Available: ", supervisor.runtime.serial_bytes_available)
+            print("Web serial data comes as text, attempting to force decode:")
+            passed_packet = get_serial_data(should_convert_slash_x_strings=True)
             return True
         return False
-        if wifi.radio.connected:
-            return True
-        else:
-            return False
+        # if wifi.radio.connected:
+        #     return True
+        # else:
+        #     return False
 
 if HAS_BLE:
     print("BLE MAC Address:", [hex(i) for i in ble.address_bytes])
@@ -182,7 +210,7 @@ while True:
             # Packet is arriving.
             red_led.value = False  # turn off red LED
             packet = Packet.from_stream(uart_service)
-        elif (HAS_WIFI and NewWifiData(packet)):
+        elif (HAS_WIFI and new_wifi_data_packet(packet)):
             print("WiFi Packet")
             # get serial from web workflow serial or via webpage/API/sockets
             red_led.value = False  # turn off red LED
@@ -197,6 +225,7 @@ while True:
         if packet is not None:
             if isinstance(packet, ColorPacket):
                 # Change the color.
+                print("Color Packet: ", packet.color)
                 color = packet.color
                 crickit.neopixel.fill(color)
 

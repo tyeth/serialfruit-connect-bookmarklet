@@ -10,7 +10,7 @@
 #TODO: Look at https://learn.adafruit.com/crickit-flippy-robot for door lip in greenhouse
 #NOTE: Original BLE project for Crickit https://learn.adafruit.com/circuitpython-ble-crickit-rover
 
-DEBUG = False
+DEBUG = True
 
 import os
 import re
@@ -114,17 +114,11 @@ def convert_slash_x_strings(input_string=''):
     result_bytes = bytearray()
     i = 0
     while i < len(input_string):
-        if re.match(r'\\x[a-fA-F0-9]{2}', input_string[i:i+4]):
-            # Convert matched hexadecimal string to bytes and extend bytearray
+        if re.match(f'\\x[a-fA-F0-9]{2}', input_string[i:i+4]):
             result_bytes.extend(bytes.fromhex(input_string[i+2:i+4]))
-            i += 4  # Skip the matched pattern
+            i += 4
         else:
-            # Handle cp1252 characters by encoding them back to cp1252 bytes
-            # This prevents 'ord()' from being used on extended characters which can be out of the 0-255 range
-            try:
-                result_bytes.extend(input_string[i].encode('cp1252'))
-            except UnicodeEncodeError:
-                print(f"Error encoding character {input_string[i]} in cp1252")
+            result_bytes.append(ord(input_string[i]))
             i += 1
     return bytes(result_bytes)
 
@@ -136,41 +130,46 @@ def check_for_waiting_serial(old_n=0):
     return n
 
 def get_serial_data(should_convert_slash_x_strings=False):
-    serial_data = bytearray()
+    #store bytes from serial and then create packet from it
+    s=''
     while supervisor.runtime.serial_bytes_available:
-        serial_data += sys.stdin.read(1)  # Read data directly as bytes
+        #try:
+        if True:
+            n = check_for_waiting_serial()
+            if n > 0:  # we read something!
+                print("New Serial Data: ",n)
+                # packet = Packet.from_stream(sys.stdin)
+                # print("Packet: ", packet)
+                # s = input()  # read a line from the serial input
+                while supervisor.runtime.serial_bytes_available:
+                    s+= sys.stdin.read(1)  # actually read it in - don't pass n as seemed wrong for web workflow
+                print(f"Asked to read {n} bytes, got {len(s)} bytes: '", s, "'", sep="")
+                # convert \xXX from incoming string, e.g. '!C\x20\x20\x20;' = b'!C   ;' (end up convert whole string to bytes)
+                if should_convert_slash_x_strings:
+                    print("Converting \\x<hex><hex> codes: ", s)
+                    s = convert_slash_x_strings(s)
+                    print("Converted: ", s)
 
-    # Log the raw bytes coming in to diagnose the exact input
-    print(f"Raw serial bytes ({len(serial_data)}): {serial_data}")
-
-    if should_convert_slash_x_strings:
-        # If you need to work with or display the data as string:
-        decoded_string = serial_data.decode('utf-8')  # Decode using cp1252 for correct display/logging
-        import cp1252
-        print(f"Decoded string (cp1252): {decoded_string}")
-        bytes_from_cp1252 = cp1252.get_decimals_from_string(decoded_string)
-        print(f"Bytes from cp1252: {bytes_from_cp1252}")
-        serial_bytes = bytes(bytes_from_cp1252)
-        print(f"bytearray from cp1252: {serial_bytes}")
-        # for char in decoded_string:
-        #     print(f"Char: {char} - Ord: {bytes(char).encode('cp1252')}")
-    else:
-        # convert string to utf-8 by decimal char values from cp1252
-        serial_bytes = serial_data
-        print(f"bytearray from raw serial: {serial_bytes}")
-
-    # # Convert bytearray to bytes for packet processing
-    # serial_bytes = bytes(serial_data)
-
-    # Use the converted bytes for packet creation or processing
-    try:
-        decoded_packet = Packet.from_bytes(serial_bytes)  # Make sure packet expects bytes
-        print("Decoded Packet: ", decoded_packet)
-        return decoded_packet
-    except ValueError as e:
-        print("Error: ", e)
-        print("Packet decoding failed: is None")
-
+                # print both text & hex version of recv'd chars (see control chars!)
+                print("S:",s)
+                print("S-utf-8-bytes",bytes(s, 'utf-8'))
+        # except Exception as e:
+        #     print("Error: ", e)
+        if s==b'\x04': #ctrl-d
+            print("Ctrl-D received, rebooting / exiting in 3 seconds")
+            time.sleep(3)
+            if hasattr(supervisor, "reload"):
+                supervisor.reload()
+            else:
+                sys.exit()
+    if s:
+        try:
+            decoded_packet = Packet.from_bytes(s if isinstance(s, bytes) else bytes(s, 'utf-8'))
+            print("Decoded Packet: ", decoded_packet)
+            return decoded_packet
+        except ValueError as e:
+            print("Error: ", e)
+            print("Packet decoding failed: is None")
     return None
 
 

@@ -137,6 +137,10 @@ def check_for_waiting_serial(old_n=0):
 
 def get_serial_data(should_convert_slash_x_strings=False):
     serial_data = bytearray()
+    if not supervisor.runtime.serial_bytes_available:
+        print("No serial bytes available, exiting get_serial_data()")
+        return None
+    print(f"get_serial_data({should_convert_slash_x_strings}) Serial Bytes Available: ", supervisor.runtime.serial_bytes_available)
     while supervisor.runtime.serial_bytes_available:
         serial_data += sys.stdin.read(1)  # Read data directly as bytes
 
@@ -156,8 +160,8 @@ def get_serial_data(should_convert_slash_x_strings=False):
         #     print(f"Char: {char} - Ord: {bytes(char).encode('cp1252')}")
     else:
         # convert string to utf-8 by decimal char values from cp1252
-        serial_bytes = serial_data
-        print(f"bytearray from raw serial: {serial_bytes}")
+        serial_bytes = bytes(serial_data)
+        print(f"bytes from raw serial: {serial_bytes}")
 
     # # Convert bytearray to bytes for packet processing
     # serial_bytes = bytes(serial_data)
@@ -170,7 +174,6 @@ def get_serial_data(should_convert_slash_x_strings=False):
     except ValueError as e:
         print("Error: ", e)
         print("Packet decoding failed: is None")
-
     return None
 
 
@@ -180,19 +183,21 @@ print("Use Web Browser or Adafruit Bluefruit app to connect")
 if wifi:
     print("WiFi MAC Address:", [hex(i) for i in wifi.radio.mac_address])
     print("WiFi IP Address:", wifi.radio.ipv4_address)
-    print("URL: http://", wifi.radio.ipv4_address, ":" + str(os.getenv("CIRCUITPY_WEB_API_PORT", 80)), "/", sep="")
-    def new_wifi_data_packet(passed_packet):  # pylint: disable=unused-argument
+    print("URL: http://", wifi.radio.ipv4_address, ":" + str(os.getenv("CIRCUITPY_WEB_API_PORT", "80")), "/", sep="")
+    
+    def new_wifi_data_packet(passed_packet, check_connected_first=True):  # pylint: disable=unused-argument
+        """Checks for data available and converts from web socket text to packet if possible."""
+        if check_connected_first and not wifi.radio.connected:
+            print("WiFi not connected, exiting new_wifi_data_packet()")
+            return None
         if supervisor.runtime.serial_bytes_available:
-            print("Serial Bytes Available: ", supervisor.runtime.serial_bytes_available)
+            print(f"new_wifi_data({passed_packet}, {check_connected_first}) Serial Bytes Available: ", supervisor.runtime.serial_bytes_available)
             print("Web serial data comes as text, attempting to force decode:")
             passed_packet = get_serial_data(should_convert_slash_x_strings=True)
             print("Web Packet: ", passed_packet)
-            return passed_packet
-        return None
-        # if wifi.radio.connected:
-        #     return True
-        # else:
-        #     return False
+        else:
+            print("No serial bytes available, exiting new_wifi_data_packet()")
+        return passed_packet
 
 if HAS_BLE:
     print("BLE MAC Address:", [hex(i) for i in ble.address_bytes])

@@ -10,7 +10,7 @@
 #TODO: Look at https://learn.adafruit.com/crickit-flippy-robot for door lip in greenhouse
 #NOTE: Original BLE project for Crickit https://learn.adafruit.com/circuitpython-ble-crickit-rover
 
-DEBUG = False
+DEBUG = True
 
 import os
 import re
@@ -87,6 +87,10 @@ except ImportError as ie:
         logError(ImportError("This example does not work with the 'wifi' library. Please use 'adafruit_esp32spi' or 'adafruit_esp32spi_socket'."))
     HAS_WIFI = False
 
+WAITING_DATA = 0  # used to keep track of available serial bytes.
+# needed in a slow loop rather than recheck in each condition/branch
+# (which leads to serial conditional stealing data from web workflow)
+
 if HAS_BLE:
     ble = BLERadio()
     uart_service = UARTService()
@@ -128,20 +132,22 @@ def convert_slash_x_strings(input_string=''):
             i += 1
     return bytes(result_bytes)
 
-def check_for_waiting_serial(old_n=0):
-    n = supervisor.runtime.serial_bytes_available
+def serial_bytes_waiting(old_n=0):
+    """Returns the number of bytes available to read from the serial connection(s)."""
+    global WAITING_DATA
+    WAITING_DATA = supervisor.runtime.serial_bytes_available
     # if n - old_n > 0:  # we read something extra!
     #     time.sleep(0.01)  # give some time to get all data - change to async
-    #     return check_for_waiting_serial(n)
-    return n
+    #     return serial_bytes_waiting(n)
+    return WAITING_DATA
 
 def get_serial_data(should_convert_slash_x_strings=False):
     serial_data = bytearray()
-    if not supervisor.runtime.serial_bytes_available:
+    if not serial_bytes_waiting():
         print("No serial bytes available, exiting get_serial_data()")
         return None
-    print(f"get_serial_data({should_convert_slash_x_strings}) Serial Bytes Available: ", supervisor.runtime.serial_bytes_available)
-    while supervisor.runtime.serial_bytes_available:
+    print(f"get_serial_data({should_convert_slash_x_strings}) Serial Bytes Available: ", WAITING_DATA)
+    while serial_bytes_waiting():
         serial_data += sys.stdin.read(1)  # Read data directly as bytes
 
     # Log the raw bytes coming in to diagnose the exact input
@@ -190,13 +196,14 @@ if wifi:
         if check_connected_first and not wifi.radio.connected:
             print("WiFi not connected, exiting new_wifi_data_packet()")
             return None
-        if supervisor.runtime.serial_bytes_available:
-            print(f"new_wifi_data({passed_packet}, {check_connected_first}) Serial Bytes Available: ", supervisor.runtime.serial_bytes_available)
+        if serial_bytes_waiting():
+            print(f"new_wifi_data({passed_packet}, {check_connected_first}) Serial Bytes Available: ", WAITING_DATA)
             print("Web serial data comes as text, attempting to force decode:")
             passed_packet = get_serial_data(should_convert_slash_x_strings=True)
             print("Web Packet: ", passed_packet)
         else:
-            print("No serial bytes available, exiting new_wifi_data_packet()")
+            if not DEBUG:
+                print("No serial bytes available, exiting new_wifi_data_packet()")
         return passed_packet
 
 if HAS_BLE:
@@ -217,6 +224,7 @@ while True:
     while (HAS_BLE and ble.connected) or (HAS_WIFI and wifi.radio.connected) or \
         (supervisor.runtime.serial_connected):
         PACKET = None
+        WAITING_DATA = 0
         if (HAS_BLE and uart_service.in_waiting):
             print("BLE Packet")
             # Packet is arriving.
@@ -225,13 +233,13 @@ while True:
         elif HAS_WIFI:
             PACKET=new_wifi_data_packet(PACKET)
             if PACKET:
-                DEBUG = False
                 print("WiFi Packet Received!", PACKET)
                 # get serial from web workflow serial or via webpage/API/sockets
                 red_led.value = False  # turn off red LED
-        if not PACKET and supervisor.runtime.serial_bytes_available:
+        # by rechecking serial bytes available here, we potentially accidentally steal new web data
+        if not PACKET and WAITING_DATA:
             if DEBUG:
-                print("No packet from BLE or WiFi, but Serial Bytes Available: ", supervisor.runtime.serial_bytes_available)
+                print("No packet from BLE or WiFi, but Serial Bytes Available: ", WAITING_DATA)
             PACKET = get_serial_data(should_convert_slash_x_strings=False)
             if PACKET:
                 print("Final check for Serial Packet successful: ", PACKET)

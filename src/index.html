@@ -46,10 +46,10 @@
     <!-- Control Pad Screen -->
     <div id="control-pad" class="screen">
         <h1>Control Pad</h1>
-        <button onclick="sendControlCommand(1)">Up</button>
-        <button onclick="sendControlCommand(2)">Down</button>
-        <button onclick="sendControlCommand(3)">Left</button>
-        <button onclick="sendControlCommand(4)">Right</button>
+        <button onmousedown="sendButton(button=1,pressed=true)" onmouseup="sendButton(1,pressed=false)">Up</button>
+        <button onmousedown="sendButton(button=2,pressed=true)" onmouseup="sendButton(2,pressed=false)">Down</button>
+        <button onmousedown="sendButton(button=3,pressed=true)" onmouseup="sendButton(3,pressed=false)">Left</button>
+        <button onmousedown="sendButton(button=4,pressed=true)" onmouseup="sendButton(4,pressed=false)">Right</button>
         <button onclick="showScreen('main-menu')">Back</button>
         <!-- Add JoyStick.js in future -->
     </div>

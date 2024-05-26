@@ -388,6 +388,11 @@ function sendColor() {
     sendPacket(colorPacket);
 }
 
+function sendButton(button, pressed) {
+    const buttonPacket = new ButtonPacket(button, pressed);
+    sendPacket(buttonPacket);
+}
+
 // Send control command
 function sendControlCommand(command) {
     const controlCommandPacket = new ControlCommandPacket(command, 0x01); // Example value
@@ -396,11 +401,18 @@ function sendControlCommand(command) {
 
 // Send accelerometer data
 function sendAccelerometerData(event) {
-    const x = event.accelerationIncludingGravity.x || 0;
-    const y = event.accelerationIncludingGravity.y || 0;
-    const z = event.accelerationIncludingGravity.z || 0;
-    const accelerometerPacket = new AccelerometerPacket(x, y, z);
-    sendPacket(accelerometerPacket);
+    window.serialfruit.lastAccelerometerEventTimestamp =
+        window.serialfruit.lastAccelerometerEventTimestamp || Date.now();
+    if (Date.now() - window.serialfruit.lastAccelerometerEventTimestamp < 500) {
+        const x = event.accelerationIncludingGravity.x || 0;
+        const y = event.accelerationIncludingGravity.y || 0;
+        const z = event.accelerationIncludingGravity.z || 0;
+        console.log('Accelerometer data (x,y,z):', x,y,z)
+        const accelerometerPacket = new AccelerometerPacket(x, y, z);
+        sendPacket(accelerometerPacket);
+    } else {
+        console.log('Skipping accelerometer data due to rate limiting');
+    }
 }
 
 // Toggle accelerometer data capture

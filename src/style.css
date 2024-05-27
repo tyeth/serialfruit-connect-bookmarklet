@@ -1,51 +1,112 @@
-.serialfruit-body {
+#serialfruit-body {
+    padding: initial;
+    margin: initial;
     font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    display: flex;
+    /* margin: 0;
+    padding: 0; */
+    /* display: flex; */
     justify-content: center;
     align-items: center;
     height: 100vh;
     background-color: #f0f0f0;
     
-    flex-direction: row;
+    /* flex-direction: row;
     align-items: center;
     text-align: center;
-    flex-wrap: wrap;
+    flex-wrap: wrap; */
 }
 
-.serialfruit-body .screen {
+#serialfruit-body * {
+    padding: initial;
+    margin: initial;
+    font: initial;
+    background-color: initial;
+    color: initial;
+}
+
+.gamepad {
+    /* setup a nice grid to represent the gamepad using the btn-up/down/left/right/a/b/x/y classes */
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+    grid-gap: 10px;
+    width: 200px;
+    height: 200px;
+    margin: 0 auto;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);    
+}
+
+
+.btn-up {
+    grid-column: 2;
+    grid-row: 1;
+}
+.btn-down {
+    grid-column: 2;
+    grid-row: 3;
+}
+.btn-left {
+    grid-column: 1;
+    grid-row: 2;
+}
+.btn-right {
+    grid-column: 3;
+    grid-row: 2;
+}
+.btn-a {
+    grid-column: 2;
+    grid-row: 2;
+}
+.btn-b {
+    grid-column: 3;
+    grid-row: 3;
+}
+.btn-x {
+    grid-column: 1;
+    grid-row: 3;
+}
+.btn-y {
+    grid-column: 1;
+    grid-row: 1;
+}
+
+
+#serialfruit-body .screen {
     display: none;
 }
-.serialfruit-body #main-menu {
-    flex-direction: column;
+#serialfruit-body #main-menu {
+    padding: 1.5rem;
 }
-.serialfruit-body .screen.active {
-    display: flex;
+#serialfruit-body .screen.active {
+    display: grid;
 }
 
-.serialfruit-body  .screen h1 {
+#serialfruit-body  .screen h1 {
     margin-bottom: 20px;
 }
 
-.serialfruit-body  .screen button {
+#serialfruit-body  .screen button {
     margin: 10px;
     padding: 10px 20px;
     font-size: 16px;
 }
 
-.serialfruit-body  #color-picker input {
+#serialfruit-body  #color-picker input {
     margin-bottom: 20px;
 }
 
-.serialfruit-body  #terminal input {
+#serialfruit-body  #terminal input {
     margin-bottom: 10px;
     width: 80%;
     padding: 10px;
     font-size: 16px;
 }
 
-.serialfruit-body  #terminal pre {
+#serialfruit-body  #terminal pre {
     margin-top: 20px;
     background-color: #fff;
     padding: 10px;

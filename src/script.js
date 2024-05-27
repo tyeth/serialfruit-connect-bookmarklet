@@ -6,7 +6,7 @@ function showScreen(screenId) {
     document.querySelectorAll('.screen').forEach(screen => {
         screen.style.display = 'none';
     });
-    document.getElementById(screenId).style.display = 'flex';
+    document.getElementById(screenId).style.display = 'grid';
 }
 
 // Base class for Bluefruit packets

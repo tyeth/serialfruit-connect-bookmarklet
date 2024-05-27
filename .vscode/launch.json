@@ -5,10 +5,28 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch Chrome",
+            "name": "Python: HTTPS Server",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/test-https-server.py",
+            "console": "integratedTerminal",
+            "args": [
+                // "-c",
+                // "import http.server, ssl; httpd = http.server.HTTPServer(('localhost', 4443), http.server.SimpleHTTPRequestHandler); httpd.socket = ssl.wrap_socket(httpd.socket, certfile='localhost.pem', keyfile='localhost-key.pem', server_side=True); print('Server running at https://localhost:4443/'); httpd.serve_forever()"
+            ]
+        },
+        {
+            "name": "Launch Chrome at HTTPS localhost:4443 ",
+            "type": "chrome",
+            "request": "launch",
+            "url": "https://localhost:4443",
+            "webRoot": "${workspaceFolder}",
+        },
+        {
+            "name": "Chrome with test index file (file:///)",
             "request": "launch",
             "type": "chrome",
-            "url": "http://localhost:8080",
+            "file": "${workspaceFolder}/test-index.html",
             "webRoot": "${workspaceFolder}"
         },
         {

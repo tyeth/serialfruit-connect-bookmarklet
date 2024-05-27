@@ -8,15 +8,17 @@
 </head>
 <body class="serialfruit-body">
     <div id="main-menu" class="screen">
-        <div>
-            <dl>
-                <dt>
-                    <h1>Serial Fruit Connect</h1><br/>
-                </dt>
-                <dd>Connect to your Bluefruit/USB/WiFi device and send commands</dt>
-            </dl>
+        <div class="title header">
+            <div>
+                <dl>
+                    <dt>
+                        <h1>Serial Fruit Connect</h1><br/>
+                    </dt>
+                    <dd>Connect to your Bluefruit/USB/WiFi device and send commands</dt>
+                </dl>
+            </div>
         </div>
-        <div>
+        <div class="buttons">
 
             <button onclick="showScreen('color-picker')">Color Picker</button>
             <button onclick="showScreen('control-pad')">Control Pad</button>
@@ -58,6 +60,10 @@
             <button class="btn-down" onmousedown="sendButton(button=6,pressed=true)" onmouseup="sendButton(6,pressed=false)">Down</button>
             <button class="btn-left" onmousedown="sendButton(button=7,pressed=true)" onmouseup="sendButton(7,pressed=false)">Left</button>
             <button class="btn-right" onmousedown="sendButton(button=8,pressed=true)" onmouseup="sendButton(8,pressed=false)">Right</button>
+            <button class="btn-a" onmousedown="sendButton(button=1,pressed=true)" onmouseup="sendButton(9,pressed=false)">A</button>
+            <button class="btn-b" onmousedown="sendButton(button=2,pressed=true)" onmouseup="sendButton(10,pressed=false)">B</button>
+            <button class="btn-x" onmousedown="sendButton(button=3,pressed=true)" onmouseup="sendButton(11,pressed=false)">X</button>
+            <button class="btn-y" onmousedown="sendButton(button=4,pressed=true)" onmouseup="sendButton(12,pressed=false)">Y</button>
         </div>
         <div>
             <button onclick="showScreen('main-menu')">Back</button>

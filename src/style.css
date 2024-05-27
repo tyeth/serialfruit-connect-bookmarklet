@@ -19,7 +19,7 @@
 #serialfruit-body * {
     padding: initial;
     margin: initial;
-    font: initial;
+    /* font: initial; */
     background-color: initial;
     color: initial;
 }

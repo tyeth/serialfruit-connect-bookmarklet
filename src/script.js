@@ -66,7 +66,12 @@ class ButtonPacket extends BluefruitPacket {
     """Right Button."""
      */
     constructor(button, pressed) {
-        const payload = new Uint8Array([String(button).charCodeAt(0), pressed ? 1 : 0]);
+        const payload = new Uint8Array(
+            [
+                ...String(button).forEach(x=>x.charCodeAt(0)),
+                ...String(pressed).forEach(y=>y.charCodeAt(0))
+            ]
+        );
         super('!B', payload);
     }
 }

@@ -1,5 +1,4 @@
 # SPDX-FileCopyrightText: 2019 John Edgar Park for Adafruit Industries
-# SPDX-FileCopyrightText: 2024 Tyeth Gundry for Adafruit Industries
 #
 # SPDX-License-Identifier: MIT
 
@@ -7,7 +6,6 @@
 # Use with the Adafruit BlueFruit LE Connect app
 # Works with CircuitPython 4.0.0-beta.1 and later
 # running on an nRF52840 Feather board and Crickit FeatherWing
-"""This is a modified example of John Parks CircuitPython BLE Cricket Rover - adding WiFi/USB"""
 
 #TODO: Look at https://learn.adafruit.com/crickit-flippy-robot for door lip in greenhouse
 #NOTE: Original BLE project for Crickit https://learn.adafruit.com/circuitpython-ble-crickit-rover
@@ -16,7 +14,7 @@ DEBUG = False
 
 import os
 import re
-import supervisor # pylint: disable=import-error
+import supervisor
 import sys
 import time
 

@@ -407,6 +407,13 @@ function sendAccelerometerData(event) {
         const x = event.accelerationIncludingGravity.x || 0;
         const y = event.accelerationIncludingGravity.y || 0;
         const z = event.accelerationIncludingGravity.z || 0;
+        console.log(event);
+        // https://timvolodine.github.io/deviceorientation-test/
+        // https://sensor-js.xyz/demo.html
+        // https://developer.mozilla.org/en-US/docs/Web/API/DeviceMotionEventAcceleration
+        // https://developer.mozilla.org/en-US/docs/Web/API/DeviceOrientationEvent/DeviceOrientationEvent
+        const absoluteRotationX = event;
+        debugger;
         console.log('Accelerometer data (x,y,z):', x,y,z)
         const accelerometerPacket = new AccelerometerPacket(x, y, z);
         sendPacket(accelerometerPacket);

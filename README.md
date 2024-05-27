@@ -2,6 +2,10 @@
 
 This project is a web-based tool that allows you to send various types of data packets over a serial connection using the Web Serial API. It can be used with a variety of devices that support serial communication, including Bluefruit devices and others.
 
+## TODO:
+
+-- Most of it, but tested ColorPackets and ButtonPackets
+
 ## Features
 
 - **Color Picker**: Send color data.

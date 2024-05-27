@@ -20,13 +20,32 @@
     padding: initial;
     margin: initial;
     /* font: initial; */
-    background-color: initial;
-    color: initial;
 }
 
-.gamepad {
+#serialfruit-body h1 {
+    margin-bottom: 6px;
+    color: #000;
+}
+
+#serialfruit-body div {
+    margin-bottom: 3px;
+    background-color: initial !important;
+    color: initial !important;
+}
+
+#serialfruit-body dt *, #serialfruit-body dd * {
+    color: #000;
+}
+
+#serialfruit-body .control-pad {
+    display:flex;
+}
+
+#serialfruit-body .gamepad {
     /* setup a nice grid to represent the gamepad using the btn-up/down/left/right/a/b/x/y classes */
-    display: grid;
+    display: inline-grid;
+    display: -ms-inline-grid;
+    display: -webkit-inline-grid;
     grid-template-columns: 1fr 1fr 1fr;
     grid-template-rows: 1fr 1fr 1fr;
     grid-gap: 10px;
@@ -38,43 +57,75 @@
     padding: 10px;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);    
 }
+#serialfruit-body .gamepad-buttons {
+    display: inline-grid;
+    display: -ms-inline-grid;
+    display: -webkit-inline-grid;
+}
+/*  .gamepad-buttons{   display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+    grid-gap: 10px;
+    min-height: 200px;
+    margin: 0 auto;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);    
+} */
+#serialfruit-body .gamepad-buttons button {
+    padding: 20px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f0f0f0;
+    cursor: pointer;
+}
+#serialfruit-body .gamepad-buttons button:hover {
+    background-color: #e0e0e0;
+}
+#serialfruit-body .gamepad-buttons button:active {
+    background-color: #ccc;
+}
+#serialfruit-body .gamepad-buttons .btn-a {
+    grid-column: 1;
+    grid-row: 1;
+}
+#serialfruit-body .gamepad-buttons .btn-b {
+    grid-column: 3;
+    grid-row: 1;
+}
+#serialfruit-body .gamepad-buttons .btn-x {
+    grid-column: 1;
+    grid-row: 3;
+}
+#serialfruit-body .gamepad-buttons .btn-y {
+    grid-column: 3;
+    grid-row: 3;
+}
 
-.buttons {
+
+#serialfruit-body .buttons {
     display:grid;
     margin:0px;
 }
 
-.btn-up {
+#serialfruit-body .btn-up {
     grid-column: 2;
     grid-row: 1;
 }
-.btn-down {
+#serialfruit-body .btn-down {
     grid-column: 2;
     grid-row: 3;
 }
-.btn-left {
+#serialfruit-body .btn-left {
     grid-column: 1;
     grid-row: 2;
 }
-.btn-right {
+#serialfruit-body .btn-right {
     grid-column: 3;
     grid-row: 2;
-}
-.btn-a {
-    grid-column: 2;
-    grid-row: 2;
-}
-.btn-b {
-    grid-column: 3;
-    grid-row: 3;
-}
-.btn-x {
-    grid-column: 1;
-    grid-row: 3;
-}
-.btn-y {
-    grid-column: 1;
-    grid-row: 1;
 }
 
 

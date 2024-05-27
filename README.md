@@ -4,6 +4,8 @@ This project is a web-based tool that allows you to send various types of data p
 
 ## TODO:
 
+Currently supports the IP/code/ or circuitpython.local/code/ based websites for accessing circuitpython devices over web-workflow. Eventually will support all 3 transports (USB/BLE/WebWorkflow)
+
 -- Most of it, but tested ColorPackets and ButtonPackets
 
 ## Features

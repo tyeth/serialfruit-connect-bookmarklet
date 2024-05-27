@@ -68,8 +68,8 @@ class ButtonPacket extends BluefruitPacket {
     constructor(button, pressed) {
         const payload = new Uint8Array(
             [
-                ...String(button).forEach(x=>x.charCodeAt(0)),
-                ...String(pressed).forEach(y=>y.charCodeAt(0))
+                ...String(button).split('').forEach(x=>x.charCodeAt(0)),
+                ...String(pressed).split('').forEach(y=>y.charCodeAt(0))
             ]
         );
         super('!B', payload);

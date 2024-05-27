@@ -46,11 +46,22 @@
     <!-- Control Pad Screen -->
     <div id="control-pad" class="screen">
         <h1>Control Pad</h1>
-        <button onmousedown="sendButton(button=1,pressed=true)" onmouseup="sendButton(1,pressed=false)">Up</button>
-        <button onmousedown="sendButton(button=2,pressed=true)" onmouseup="sendButton(2,pressed=false)">Down</button>
-        <button onmousedown="sendButton(button=3,pressed=true)" onmouseup="sendButton(3,pressed=false)">Left</button>
-        <button onmousedown="sendButton(button=4,pressed=true)" onmouseup="sendButton(4,pressed=false)">Right</button>
-        <button onclick="showScreen('main-menu')">Back</button>
+        <div>
+
+            <button onmousedown="sendButton(button=1,pressed=true)" onmouseup="sendButton(1,pressed=false)">1</button>
+            <button onmousedown="sendButton(button=2,pressed=true)" onmouseup="sendButton(2,pressed=false)">2</button>
+            <button onmousedown="sendButton(button=3,pressed=true)" onmouseup="sendButton(3,pressed=false)">3</button>
+            <button onmousedown="sendButton(button=4,pressed=true)" onmouseup="sendButton(4,pressed=false)">4</button>
+        </div>
+        <div class="gamepad">
+            <button class="btn-up" onmousedown="sendButton(button=5,pressed=true)" onmouseup="sendButton(5,pressed=false)">Up</button>
+            <button class="btn-down" onmousedown="sendButton(button=6,pressed=true)" onmouseup="sendButton(6,pressed=false)">Down</button>
+            <button class="btn-left" onmousedown="sendButton(button=7,pressed=true)" onmouseup="sendButton(7,pressed=false)">Left</button>
+            <button class="btn-right" onmousedown="sendButton(button=8,pressed=true)" onmouseup="sendButton(8,pressed=false)">Right</button>
+        </div>
+        <div>
+            <button onclick="showScreen('main-menu')">Back</button>
+        </div>
         <!-- Add JoyStick.js in future -->
     </div>
 

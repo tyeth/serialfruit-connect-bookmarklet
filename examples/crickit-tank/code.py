@@ -10,7 +10,7 @@
 #TODO: Look at https://learn.adafruit.com/crickit-flippy-robot for door lip in greenhouse
 #NOTE: Original BLE project for Crickit https://learn.adafruit.com/circuitpython-ble-crickit-rover
 
-DEBUG = True
+DEBUG = False
 
 import os
 import re
@@ -144,7 +144,7 @@ def serial_bytes_waiting(old_n=0):
 def get_serial_data(should_convert_slash_x_strings=False):
     serial_data = bytearray()
     if not serial_bytes_waiting():
-        print("No serial bytes available, exiting get_serial_data()")
+        if DEBUG: print("No serial bytes available, exiting get_serial_data()")
         return None
     print(f"get_serial_data({should_convert_slash_x_strings}) Serial Bytes Available: ", WAITING_DATA)
     while serial_bytes_waiting():
@@ -202,7 +202,7 @@ if wifi:
             passed_packet = get_serial_data(should_convert_slash_x_strings=True)
             print("Web Packet: ", passed_packet)
         else:
-            if not DEBUG:
+            if DEBUG:
                 print("No serial bytes available, exiting new_wifi_data_packet()")
         return passed_packet
 
@@ -249,7 +249,7 @@ while True:
             red_led.value = False  # turn off red LED
         if PACKET is not None:
             print("Valid Packet: ", PACKET)
-            DEBUG = False
+            # DEBUG = False
             if isinstance(PACKET, ColorPacket):
                 # Change the color.
                 print("Color Packet: ", PACKET.color)

@@ -47,8 +47,26 @@ class AccelerometerPacket extends XYZPacket {
 }
 
 class ButtonPacket extends BluefruitPacket {
+    /*
+    BUTTON_1: str = "1"
+    """Code for Button 1 on the Bluefruit LE Connect app Control Pad screen."""
+    BUTTON_2: str = "2"
+    """Button 2."""
+    BUTTON_3: str = "3"
+    """Button 3."""
+    BUTTON_4: str = "4"
+    """Button 4."""
+    UP: str = "5"
+    """Up Button."""
+    DOWN: str = "6"
+    """Down Button."""
+    LEFT: str = "7"
+    """Left Button."""
+    RIGHT: str = "8"
+    """Right Button."""
+     */
     constructor(button, pressed) {
-        const payload = new Uint8Array([button.charCodeAt(0), pressed ? 1 : 0]);
+        const payload = new Uint8Array([str(button).charCodeAt(0), pressed ? 1 : 0]);
         super('!B', payload);
     }
 }

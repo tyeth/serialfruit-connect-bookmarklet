@@ -69,7 +69,7 @@ class ButtonPacket extends BluefruitPacket {
         const payload = new Uint8Array(
             [
                 ...String(button).split('').map(x=>x.charCodeAt(0)),
-                ...String(int(pressed)).split('').map(y=>y.charCodeAt(0))
+                ...(pressed ? "1":"0").split('').map(y=>y.charCodeAt(0))
             ]
         );
         super('!B', payload);

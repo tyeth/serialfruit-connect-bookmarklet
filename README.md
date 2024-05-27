@@ -45,6 +45,7 @@ javascript:(function() {
 ```
 _(You may need to add the `javascript:` prefix back into the address bar after pasting the code from above, as browsers remove it as part of keeping you safe - bookmarks are not affected by this protection)_
 
+** You may wish to use the tag @main instead of @v0.0.0.1 etc as that will always be the Latest code, but may therefore break! **
 
 ## Available User Interface (UI) screens
 

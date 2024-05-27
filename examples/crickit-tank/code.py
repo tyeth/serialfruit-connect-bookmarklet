@@ -14,7 +14,7 @@ DEBUG = False
 
 import os
 import re
-import supervisor
+import supervisor # pylint: disable=import-error
 import sys
 import time
 

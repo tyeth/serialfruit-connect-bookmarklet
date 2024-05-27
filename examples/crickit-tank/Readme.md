@@ -18,6 +18,19 @@ Before getting started, make sure you have the following:
 4. Notice the side panel that now appears (otherwise check dev console and report issue)
 5. Follow the on-screen instructions in panel to control the Crickit Tank using Bluetooth, Wi-Fi, or USB.
 
+## Development
+
+You'll need the following to stop your editor moaning about imports on a real computer:
+```shell
+pip install circuitpython-stubs --upgrade
+circuitpython_setboard adafruit_feather_esp32s3_4mbflash_2mbpsram
+pip install adafruit-circuitpython-ble --upgrade
+pip install adafruit-circuitpython-bluefruitconnect --upgrade
+pip install adafruit-circuitpython-crickit --upgrade
+pip install adafruit-circuitpython-neopixel --upgrade
+echo "use circuitpython_setboard --list to show other boards"
+```
+
 ## Contributing
 
 Contributions are welcome! If you have any ideas, suggestions, or bug reports, please open an issue or submit a pull request.

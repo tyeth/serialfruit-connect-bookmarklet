@@ -46,6 +46,27 @@ class AccelerometerPacket extends XYZPacket {
     }
 }
 
+class StringPacket extends BluefruitPacket {
+    constructor(string) {
+        const payload = new TextEncoder().encode(string);
+        super('!S', payload);
+    }
+}
+
+class RawPacket extends BluefruitPacket {
+    constructor(bytes) {
+        const payload = new Uint8Array(bytes);
+        super('!R', payload);
+    }
+}
+
+class DFUPacket extends BluefruitPacket {
+    constructor(data) {
+        const payload = new Uint8Array(data);
+        super('!D', payload);
+    }
+}
+
 class ButtonPacket extends BluefruitPacket {
     /*
     BUTTON_1: str = "1"

@@ -305,7 +305,7 @@ async function updateStatsTable() {
                     deviceTextContents = 'Unknown';
                     stateTextContents = 'Unknown';
                 }
-                returnedDeviceAndStates.push({device: deviceTextContents, state: stateTextContents});
+                returnedDeviceAndStates.push([deviceTextContents, stateTextContents]);
             });
         }
         if (returnedDeviceAndStates.length !== 0) {

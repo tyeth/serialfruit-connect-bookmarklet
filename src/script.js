@@ -432,9 +432,21 @@ function sendColor() {
     sendPacket(colorPacket);
 }
 
-function sendButton(button, pressed) {
-    const buttonPacket = new ButtonPacket(button, pressed);
-    sendPacket(buttonPacket);
+function sendButton(button, pressed, eventType) {
+    //todo: Add support for toggling button click type (mousedown, mouseup, versus click)
+    switch ((""+eventType).startsWith('on') ? eventType.slice(2) : eventType) {
+        case 'mousedown':
+            console.log('ignoring mousedown event for now...')
+            break;
+        case 'mouseup':
+            console.log('ignoring mouseup event for now...')
+            break;
+        case 'click':
+        default:
+            const buttonPacket = new ButtonPacket(button, pressed);
+            sendPacket(buttonPacket);
+            break;
+    }
 }
 
 // Send control command

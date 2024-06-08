@@ -137,15 +137,14 @@ _(You may need to add the `javascript:` prefix back into the address bar after p
 
 ### Local running:
 
-1. install mkcert and create a cert for localhost:
+1. install mkcert and set system to trust (with --install), a cert will be generated later:
 ```
 mkcert --install
-mkcert localhost
 ```
 2. use vscode launch tasks to run python server task and it will copy all /src files and mangle them to localhost
-3. use this bookmarklet code instead after browsing to https://localhost:4443/ :
+3. use the bookmarklet code printed in the console at server startup instead, which will be similar to:
 ```javascript
-javascript:(function(){var script=document.createElement('script');script.src='https://localhost:4443/localhost-src/bookmarklet.js';document.body.appendChild(script);})();
+javascript:(function(){var script=document.createElement('script');script.src='https://192.168.43.244:4443/localhost-src/bookmarklet.js';document.body.appendChild(script);})();
 ```
 
 ### License

@@ -1,10 +1,21 @@
 import http.server, ssl, os,re, signal, sys
 import re._constants;
 
-# ssl_args = {'certfile':'127.0.0.1.pem', 'keyfile':'127.0.0.1-key.pem'}
+# get local ip address as localhost/127.0.0.1 is blocked by CORS
+import socket
+hostname = socket.gethostname()
+local_ip = socket.gethostbyname(hostname)
+print(f'Local IP Address: {local_ip}')
+host = local_ip
+
+if not os.path.exists(host+'.pem') or not os.path.exists(host+'-key.pem'):
+    print(f'Generating SSL certificate for {host}...');
+    os.system(f'mkcert {host}');
+    print(f'SSL certificate generated for {host}');
+
 # host = '127.0.0.1';
-ssl_args = {'certfile':'localhost.pem', 'keyfile':'localhost-key.pem'}
-host = 'localhost';
+# host = 'localhost';
+ssl_args = {'certfile':host+'.pem', 'keyfile':host+'-key.pem'}
 
 port = 4443;
 
@@ -49,5 +60,8 @@ for file in os.listdir('src'):
 # Register the signal handler for graceful shutdown
 signal.signal(signal.SIGINT, signal_handler)
 
-print(f'Server running at https://{host}:{port}/');
+print(f'\nServer running at https://{host}:{port}/');
+
+print(f"\nCopy this into the bookmark / address bar:\n\njavascript:(function(){{var script=document.createElement('script');script.src='https://{host}:{port}/localhost-src/bookmarklet.js';document.body.appendChild(script);}})();")
+
 httpd.serve_forever()

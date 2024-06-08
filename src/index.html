@@ -54,23 +54,23 @@
         <h1>Control Pad</h1>
         <div>
 
-            <button onmousedown="sendButton(button=1,pressed=true)" onmouseup="sendButton(1,pressed=false)">1</button>
-            <button onmousedown="sendButton(button=2,pressed=true)" onmouseup="sendButton(2,pressed=false)">2</button>
-            <button onmousedown="sendButton(button=3,pressed=true)" onmouseup="sendButton(3,pressed=false)">3</button>
-            <button onmousedown="sendButton(button=4,pressed=true)" onmouseup="sendButton(4,pressed=false)">4</button>
+            <button onmousedown="sendButton(button=1,pressed=true, 'onmousedown')" onmouseup="sendButton(1,pressed=false, 'onmouseup')" onclick="sendButton(1,pressed=false, 'onclick')">1</button>
+            <button onmousedown="sendButton(button=2,pressed=true, 'onmousedown')" onmouseup="sendButton(2,pressed=false, 'onmouseup')" onclick="sendButton(2,pressed=false, 'onclick')">2</button>
+            <button onmousedown="sendButton(button=3,pressed=true, 'onmousedown')" onmouseup="sendButton(3,pressed=false, 'onmouseup')" onclick="sendButton(3,pressed=false, 'onclick')">3</button>
+            <button onmousedown="sendButton(button=4,pressed=true, 'onmousedown')" onmouseup="sendButton(4,pressed=false, 'onmouseup')" onclick="sendButton(4,pressed=false, 'onclick')">4</button>
         </div>
         <div>
             <div class="gamepad">
-                <button class="btn-up" onmousedown="sendButton(button=5,pressed=true)" onmouseup="sendButton(5,pressed=false)">Up</button>
-                <button class="btn-down" onmousedown="sendButton(button=6,pressed=true)" onmouseup="sendButton(6,pressed=false)">Down</button>
-                <button class="btn-left" onmousedown="sendButton(button=7,pressed=true)" onmouseup="sendButton(7,pressed=false)">Left</button>
-                <button class="btn-right" onmousedown="sendButton(button=8,pressed=true)" onmouseup="sendButton(8,pressed=false)">Right</button>
+                <button class="btn-up" onmousedown="sendButton(button=5,pressed=true, 'onmousedown')" onmouseup="sendButton(5,pressed=false, 'onmouseup')" onclick="sendButton(button=5,pressed=true, 'onclick')">Up</button>
+                <button class="btn-down" onmousedown="sendButton(button=6,pressed=true, 'onmousedown')" onmouseup="sendButton(6,pressed=false, 'onmouseup')" onclick="sendButton(button=6,pressed=true, 'onclick')">Down</button>
+                <button class="btn-left" onmousedown="sendButton(button=7,pressed=true, 'onmousedown')" onmouseup="sendButton(7,pressed=false, 'onmouseup')" onclick="sendButton(button=7,pressed=true, 'onclick')">Left</button>
+                <button class="btn-right" onmousedown="sendButton(button=8,pressed=true, 'onmousedown')" onmouseup="sendButton(8,pressed=false, 'onmouseup')" onclick="sendButton(button=8,pressed=true, 'onclick')">Right</button>
             </div>
             <div class="gamepad gamepad-buttons">
-                <button class="btn-a" onmousedown="sendButton(button=1,pressed=true)" onmouseup="sendButton(1,pressed=false)">A</button>
-                <button class="btn-b" onmousedown="sendButton(button=2,pressed=true)" onmouseup="sendButton(2,pressed=false)">B</button>
-                <button class="btn-x" onmousedown="sendButton(button=3,pressed=true)" onmouseup="sendButton(3,pressed=false)">X</button>
-                <button class="btn-y" onmousedown="sendButton(button=4,pressed=true)" onmouseup="sendButton(4,pressed=false)">Y</button>
+                <button class="btn-a" onmousedown="sendButton(button=1,pressed=true, 'onmousedown')" onmouseup="sendButton(1,pressed=false, 'onmouseup')" onclick="sendButton(1,pressed=false, 'click')">A</button>
+                <button class="btn-b" onmousedown="sendButton(button=2,pressed=true, 'onmousedown')" onmouseup="sendButton(2,pressed=false, 'onmouseup')" onclick="sendButton(2,pressed=false, 'click')">B</button>
+                <button class="btn-x" onmousedown="sendButton(button=3,pressed=true, 'onmousedown')" onmouseup="sendButton(3,pressed=false, 'onmouseup')" onclick="sendButton(3,pressed=false, 'click')">X</button>
+                <button class="btn-y" onmousedown="sendButton(button=4,pressed=true, 'onmousedown')" onmouseup="sendButton(4,pressed=false, 'onmouseup')" onclick="sendButton(4,pressed=false, 'click')">Y</button>
             </div>
         </div>
         <div>

@@ -414,7 +414,7 @@ async function sendPacket(packet) {
     ensureAddressAndSocketAccess();
     if (!writer) await connectAnySerial();
     try {
-        const packetArray = packet.toArray();
+        const packetArray = packet.toBytes();
         await writer.write(packetArray);
         console.log("Successfully sent packet:", packetArray);
     } catch (error) {

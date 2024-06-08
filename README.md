@@ -145,7 +145,7 @@ mkcert localhost
 2. use vscode launch tasks to run python server task and it will copy all /src files and mangle them to localhost
 3. use this bookmarklet code instead after browsing to https://localhost:4443/ :
 ```javascript
-javascript:(function(){var script=document.createElement('script');script.src='/localhost-src/bookmarklet.js';document.body.appendChild(script);})();
+javascript:(function(){var script=document.createElement('script');script.src='https://localhost:4443/localhost-src/bookmarklet.js';document.body.appendChild(script);})();
 ```
 
 ### License

@@ -414,9 +414,25 @@ async function sendPacket(packet) {
     ensureAddressAndSocketAccess();
     if (!writer) await connectAnySerial();
     try {
-        const packetArray = packet.toBytes();
-        await writer.write(packetArray);
-        console.log("Successfully sent packet:", packetArray);
+        // if already Uint8Array, just send it
+        if (packet instanceof Uint8Array) {
+            await writer.write(packet);
+            console.log("Successfully sent packet:", packet);
+            return;
+        } else if (packet instanceof BluefruitPacket) {
+            await writer.write(packet.toBytes());
+            console.log("Successfully sent packet:", packet.toBytes());
+            return;
+        } else {
+            // assume it's a string
+            const packetArray = new TextEncoder().encode(packet);
+            await writer.write(packetArray);
+            console.log("Successfully sent packet:", packetArray);
+            return;
+        }
+        // const packetArray = packet.toBytes();
+        // await writer.write(packetArray);
+        // console.log("Successfully sent packet:", packetArray);
     } catch (error) {
         console.error("Failed to send packet: ", error);
     }

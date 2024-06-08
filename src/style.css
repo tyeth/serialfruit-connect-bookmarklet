@@ -37,6 +37,10 @@
     color: #000;
 }
 
+#serialfruit-body table#statsTable td {
+    font-size: x-small;
+}
+
 #serialfruit-body .control-pad {
     display:flex;
 }

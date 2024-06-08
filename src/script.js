@@ -255,7 +255,9 @@ async function ensureWebsocketsHooked() {
             return trackedSockets;
         };
         window.serialfruit.cleanTrackedSockets = function () {
-            trackedSockets = trackedSockets.filter((x) => x?.readyState !== 3);
+            trackedSockets = trackedSockets.filter((x) => (x instanceof WebSocket && x?.readyState == 1) ||
+                (x instanceof SerialPort && x?.readable && x?.writable) ||
+                (x instanceof BluetoothDevice && x?.gatt?.connected));
         };
         window.serialfruit._trackedSockets = trackedSockets;
         

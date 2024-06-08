@@ -328,7 +328,7 @@ async function updateStatsTable() {
                 newRow.appendChild(deviceCell);
                 newRow.appendChild(stateCell);
 
-                deviceElement.appendChild(newRow);
+                statsTableBody.appendChild(newRow);
             });
         }
     }

@@ -263,6 +263,30 @@ async function ensureWebsocketsHooked() {
     }
 }
 
+async function updateStatsTable() {
+    if (window.serialfruit.getTrackedSockets) {
+        const trackedSockets = window.serialfruit.getTrackedSockets();
+        const statsTable = document.getElementById('statsTable');
+        if (statsTable) {
+            const tbody = statsTable.querySelector('tbody');
+            if (tbody) {
+                tbody.innerHTML = '';
+                trackedSockets.forEach((ws) => {
+                    const tr = document.createElement('tr');
+                    const td1 = document.createElement('td');
+                    td1.textContent = ws.url;
+                    const td2 = document.createElement('td');
+                    td2.textContent = ws.readyState;
+                    tr.appendChild(td1);
+                    tr.appendChild(td2);
+                    tbody.appendChild(tr);
+                });
+            }
+        }
+    }
+
+}
+
 // Ensure access to serial port and writer
 async function ensureAddressAndSocketAccess() {
     if (window.location.host.match(/^((192.168)|(cpy-))/i)) {
@@ -623,3 +647,5 @@ window.serialfruit = window.serialfruit || {};
 window.serialfruit.showScreen = showScreen;
 window.serialfruit.ensureAddressAndSocketAccess = ensureAddressAndSocketAccess;
 window.serialfruit._trackedSockets = [];
+
+setInterval(updateStatsTable, 2000);

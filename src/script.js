@@ -648,4 +648,4 @@ window.serialfruit.showScreen = showScreen;
 window.serialfruit.ensureAddressAndSocketAccess = ensureAddressAndSocketAccess;
 window.serialfruit._trackedSockets = [];
 
-setInterval(updateStatsTable, 2000);
+setInterval(updateStatsTable, 5000);

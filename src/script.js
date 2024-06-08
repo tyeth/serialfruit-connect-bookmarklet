@@ -267,13 +267,12 @@ async function ensureWebsocketsHooked() {
 
 async function updateStatsTable() {
     if (window.serialfruit.getTrackedSockets) {
-        const trackedSockets = window.serialfruit.getTrackedSockets();
+        let trackedSockets = window.serialfruit.getTrackedSockets();
         const deviceElement = document.getElementById('web-serial-device');
         const stateElement = document.getElementById('web-serial-state');
+        let returnedDeviceAndStates = [];
         if (!trackedSockets) {
-            // setup None/Disconnected cells:
-            deviceTextContents = 'None';
-            stateTextContents= 'Disconnected';
+            returnedDeviceAndStates = ['No tracked sockets', 'Disconnected']
         } else {
             trackedSockets.forEach((ws) => {
                 let deviceElement, stateElement;
@@ -306,21 +305,31 @@ async function updateStatsTable() {
                     deviceTextContents = 'Unknown';
                     stateTextContents = 'Unknown';
                 }
+                returnedDeviceAndStates.push({device: deviceTextContents, state: stateTextContents});
             });
         }
-        if (deviceElement && stateElement) {
-            // Create a new row for each device
-            const newRow = document.createElement('tr');
-            const deviceCell = document.createElement('td');
-            const stateCell = document.createElement('td');
+        if (returnedDeviceAndStates.length !== 0) {
+            // Clear the table
+            const statsTableBody = document.getElementById('statsTableBody');
+            while (statsTableBody.firstChild) {
+                statsTableBody.removeChild(statsTableBody.firstChild);
+            }
 
-            deviceCell.textContent = ws.url;
-            stateCell.textContent = ws.readyState;
+            returnedDeviceAndStates.forEach((deviceTextContents, stateTextContents) => {
 
-            newRow.appendChild(deviceCell);
-            newRow.appendChild(stateCell);
+                // Create a new row for each device
+                const newRow = document.createElement('tr');
+                const deviceCell = document.createElement('td');
+                const stateCell = document.createElement('td');
 
-            deviceElement.appendChild(newRow);
+                deviceCell.textContent = deviceTextContents;
+                stateCell.textContent = stateTextContents;
+
+                newRow.appendChild(deviceCell);
+                newRow.appendChild(stateCell);
+
+                deviceElement.appendChild(newRow);
+            });
         }
     }
 }

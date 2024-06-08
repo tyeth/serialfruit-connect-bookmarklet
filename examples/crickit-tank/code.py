@@ -231,13 +231,13 @@ while True:
             red_led.value = False  # turn off red LED
             PACKET = Packet.from_stream(uart_service)
         elif HAS_WIFI:
-            PACKET=new_wifi_data_packet(PACKET)
+            PACKET=new_wifi_data_packet(PACKET) # updates WAITING_DATA from serial_bytes_waiting
             if PACKET:
                 print("WiFi Packet Received!", PACKET)
                 # get serial from web workflow serial or via webpage/API/sockets
                 red_led.value = False  # turn off red LED
         # by rechecking serial bytes available here, we potentially accidentally steal new web data
-        if not PACKET and WAITING_DATA:
+        if (not PACKET and WAITING_DATA) or not HAS_WIFI: # refactor to update WAITINGDATA even if no wifi
             if DEBUG:
                 print("No packet from BLE or WiFi, but Serial Bytes Available: ", WAITING_DATA)
             PACKET = get_serial_data(should_convert_slash_x_strings=False)

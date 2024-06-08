@@ -266,26 +266,47 @@ async function ensureWebsocketsHooked() {
 async function updateStatsTable() {
     if (window.serialfruit.getTrackedSockets) {
         const trackedSockets = window.serialfruit.getTrackedSockets();
-        const statsTable = document.getElementById('statsTable');
-        if (statsTable) {
-            const tbody = statsTable.querySelector('tbody');
-            if (tbody) {
-                tbody.innerHTML = '';
-                trackedSockets.forEach((ws) => {
-                    const tr = document.createElement('tr');
-                    const td1 = document.createElement('td');
-                    td1.textContent = ws.url;
-                    const td2 = document.createElement('td');
-                    td2.textContent = ws.readyState;
-                    tr.appendChild(td1);
-                    tr.appendChild(td2);
-                    tbody.appendChild(tr);
-                });
+        trackedSockets.forEach((ws) => {
+            let deviceElement, stateElement;
+            if (ws instanceof WebSocket) {
+                deviceElement = document.getElementById('web-serial-device');
+                deviceTextContents = ws.url;
+                stateElement = document.getElementById('web-serial-state');
+                stateTextContents = ws.readyState;
+            } else if (ws instanceof SerialPort) {
+                deviceElement = document.getElementById('web-serial-device');
+                deviceTextContents = ws.name;
+                stateElement = document.getElementById('web-serial-state');
+                stateTextContents = ws.readable && ws.writable ? 'open' : 'closed';
+            } else if (ws instanceof BluetoothDevice) {
+                deviceElement = document.getElementById('web-serial-device');
+                deviceTextContents = ws.name;
+                stateElement = document.getElementById('web-serial-state');
+                stateTextContents = ws.gatt.connected ? 'open' : 'closed';
+            } else {
+                console.error('Unknown device type:', ws);
+                return;
             }
-        }
-    }
 
+
+            if (deviceElement && stateElement) {
+                // Create a new row for each device
+                const newRow = document.createElement('tr');
+                const deviceCell = document.createElement('td');
+                const stateCell = document.createElement('td');
+
+                deviceCell.textContent = ws.url;
+                stateCell.textContent = ws.readyState;
+
+                newRow.appendChild(deviceCell);
+                newRow.appendChild(stateCell);
+
+                deviceElement.appendChild(newRow);
+            }
+        });
+    }
 }
+
 
 // Ensure access to serial port and writer
 async function ensureAddressAndSocketAccess() {

@@ -229,7 +229,7 @@ async function ensureWebsocketsHooked() {
                     console.log('Closing WebSocket:', ws);
                     ws.close();
                 }
-                console.log('Existing WebSocket connections forceably closed.');
+                console.error('Existing WebSocket connections forceably closed.');
             }
             return;
         } else if (window.serialfruit.getTrackedSockets().length === 1) {

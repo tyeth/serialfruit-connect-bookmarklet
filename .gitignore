@@ -1,3 +1,2 @@
-localhost-key.pem
-localhost.pem
+*.pem
 localhost-src/

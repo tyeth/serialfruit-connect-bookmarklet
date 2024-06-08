@@ -268,44 +268,60 @@ async function ensureWebsocketsHooked() {
 async function updateStatsTable() {
     if (window.serialfruit.getTrackedSockets) {
         const trackedSockets = window.serialfruit.getTrackedSockets();
-        trackedSockets.forEach((ws) => {
-            let deviceElement, stateElement;
-            if (ws instanceof WebSocket) {
-                deviceElement = document.getElementById('web-serial-device');
-                deviceTextContents = ws.url;
-                stateElement = document.getElementById('web-serial-state');
-                stateTextContents = ws.readyState;
-            } else if (ws instanceof SerialPort) {
-                deviceElement = document.getElementById('web-serial-device');
-                deviceTextContents = ws.name;
-                stateElement = document.getElementById('web-serial-state');
-                stateTextContents = ws.readable && ws.writable ? 'open' : 'closed';
-            } else if (ws instanceof BluetoothDevice) {
-                deviceElement = document.getElementById('web-serial-device');
-                deviceTextContents = ws.name;
-                stateElement = document.getElementById('web-serial-state');
-                stateTextContents = ws.gatt.connected ? 'open' : 'closed';
-            } else {
-                console.error('Unknown device type:', ws);
-                return;
-            }
+        const deviceElement = document.getElementById('web-serial-device');
+        const stateElement = document.getElementById('web-serial-state');
+        if (!trackedSockets) {
+            // setup None/Disconnected cells:
+            deviceTextContents = 'None';
+            stateTextContents= 'Disconnected';
+        } else {
+            trackedSockets.forEach((ws) => {
+                let deviceElement, stateElement;
+                if (ws instanceof WebSocket) {
+                    deviceTextContents = ws.url;
+                    switch (ws.readyState) {
+                        case 0:
+                            stateTextContents = 'connecting';
+                            break;
+                        case 1:
+                            stateTextContents = 'open';
+                            break;
+                        case 2:
+                            stateTextContents = 'closing';
+                            break;
+                        case 3:
+                            stateTextContents = 'closed';
+                            break;
+                        default:
+                            stateTextContents = ws.readyState;
+                    }
+                } else if (ws instanceof SerialPort) {
+                    deviceTextContents = "Uart:" + ws.name;
+                    stateTextContents = ws.readable && ws.writable ? 'open' : 'closed';
+                } else if (ws instanceof BluetoothDevice) {
+                    deviceTextContents = "BT:" + ws.name;
+                    stateTextContents = ws.gatt.connected ? 'open' : 'closed';
+                } else {
+                    console.error('Unknown device type:', ws);
+                    deviceTextContents = 'Unknown';
+                    stateTextContents = 'Unknown';
+                }
+            });
+        }
+        if (deviceElement && stateElement) {
+            // Create a new row for each device
+            const newRow = document.createElement('tr');
+            const deviceCell = document.createElement('td');
+            const stateCell = document.createElement('td');
 
+            deviceCell.textContent = ws.url;
+            stateCell.textContent = ws.readyState;
 
-            if (deviceElement && stateElement) {
-                // Create a new row for each device
-                const newRow = document.createElement('tr');
-                const deviceCell = document.createElement('td');
-                const stateCell = document.createElement('td');
+            newRow.appendChild(deviceCell);
+            newRow.appendChild(stateCell);
 
-                deviceCell.textContent = ws.url;
-                stateCell.textContent = ws.readyState;
-
-                newRow.appendChild(deviceCell);
-                newRow.appendChild(stateCell);
-
-                deviceElement.appendChild(newRow);
-            }
-        });
+            deviceElement.appendChild(newRow);
+        }
     }
 }
 

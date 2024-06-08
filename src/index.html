@@ -22,33 +22,37 @@
             <div class="connection-stats">
                 <!-- TODO: a table with rows for captured websockets, serial ports, and BLE connections, and columns for current, versus known devices -->
                 <table id="statsTable">
-                    <tr>
-                        <th>Connection</th>
-                        <th>Device</th>
-                        <th>State</th>
-                    </tr>
-                    <tr>
-                        <td>Web Serial</td>
-                        <td id="web-serial-device">
-                        None
-                            <!-- <table style="display: inline-table;">
-                                <tbody><tr><td>None</td><td>Disconnected</td></tr></tbody>
-                            </table> -->
-                        </td>
-                        <td id="web-serial-state">Disconnected</td>
-                    </tr>
-                    <tr>
-                        <td>Web Bluetooth</td>
-                        <td id="web-bluetooth-device">None</td>
-                        <td id="web-bluetooth-state">Disconnected</td>
-                    </tr>
-                    <tr>
-                        <td>WebUSB</td>
-                        <td id="web-usb-device">None</td>
-                        <td id="web-usb-state">Disconnected</td>
-                    </tr>
+                    <thead>
+                        <tr>
+                            <th>Connection</th>
+                            <th>Device</th>
+                            <th>State</th>
+                        </tr>
+                    </thead>
+                    <tbody id="statsTableBody">
+                        <tr>
+                            <td>Web Serial</td>
+                            <td id="web-serial-device">
+                            None
+                                <!-- <table style="display: inline-table;">
+                                    <tbody><tr><td>None</td><td>Disconnected</td></tr></tbody>
+                                </table> -->
+                            </td>
+                            <td id="web-serial-state">Disconnected</td>
+                        </tr>
+                        <tr>
+                            <td>Web Bluetooth</td>
+                            <td id="web-bluetooth-device">None</td>
+                            <td id="web-bluetooth-state">Disconnected</td>
+                        </tr>
+                        <tr>
+                            <td>WebUSB</td>
+                            <td id="web-usb-device">None</td>
+                            <td id="web-usb-state">Disconnected</td>
+                        </tr>
+                    </tbody>
                 </table>
-                <!-- TODO: any localStorage / browserStorage related info, like load/export/show neopixel templates or firmata things, or maybe custom panels like Adafruit Web Bluetooth Dashboard -->
+            <!-- TODO: any localStorage / browserStorage related info, like load/export/show neopixel templates or firmata things, or maybe custom panels like Adafruit Web Bluetooth Dashboard -->
 
             </div>
         </div>

@@ -567,13 +567,26 @@ function sendAccelerometerData(event) {
 }
 
 // Toggle accelerometer data capture
-function toggleAccelerometer() {
-    if (accelerometerEnabled) {
-        window.removeEventListener('devicemotion', sendAccelerometerData);
-    } else {
-        window.addEventListener('devicemotion', sendAccelerometerData);
+function toggleAccelerometer(deviceOrBrowser = 'browser') {
+    if (deviceOrBrowser === 'device') {
+        if (window.DeviceMotionEvent) {
+            if (accelerometerEnabled) {
+                window.removeEventListener('devicemotion', sendAccelerometerData);
+                console.log('Device motion event listener removed');
+            } else {
+                window.addEventListener('devicemotion', sendAccelerometerData);
+                console.log('Device motion event listener added');
+            }
+            accelerometerEnabled = !accelerometerEnabled;
+        } else {
+            console.error('Device motion not supported on this device');
+            alert('Device motion not supported on this device, possibly try messing with the browser settings');
+        }
+        return;
+    } else if (deviceOrBrowser === 'browser') {
+        // TODO: set up subscription to incoming messages, route to accelerometer visualisation or appropriate bridging transport (BLE/web-serial/WifiWebWorkflow/AdafruitIO-MQTT/AdafruitIO-REST)
+        console.log('Toggling browser accelerometer data capture');
     }
-    accelerometerEnabled = !accelerometerEnabled;
 }
 
 // Send AT command

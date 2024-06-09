@@ -76,7 +76,7 @@
     <!-- Color Picker Screen -->
     <div id="color-picker" class="screen">
         <h1>Color Picker</h1>
-        <button onclick="showScreen('main-menu')">Back to menu</button>
+        <button onclick="showScreen('main-menu')">Back to menu</button><hr />
         <input type="color" id="colorInput">
         <button onclick="sendColor()">Send Color</button>
     </div>
@@ -93,7 +93,7 @@
         </div>
         <div>
             <div>
-                <button onclick="showScreen('main-menu')">Back to menu</button>
+                <button onclick="showScreen('main-menu')">Back to menu</button><hr />
             </div>
             <div class="gamepad">
                 <button class="btn-up" onmousedown="sendButton(button=5,pressed=true, 'onmousedown')" onmouseup="sendButton(5,pressed=false, 'onmouseup')" onclick="sendButton(button=5,pressed=true, 'onclick')">Up</button>
@@ -114,7 +114,7 @@
     <!-- Accelerometer Screen -->
     <div id="accelerometer" class="screen">
         <h1>Accelerometer</h1>
-        <button onclick="showScreen('main-menu')">Back to menu</button>
+        <button onclick="showScreen('main-menu')">Back to menu</button><hr />
         <button onclick="toggleAccelerometer('browser')">Start/Stop Sending Browser based Accelerometer Data</button>
         <button onclick="toggleAccelerometer('device')">Start/Stop Receiving Serial Device Data</button>
     </div>
@@ -122,7 +122,7 @@
     <!-- Terminal Screen -->
     <div id="terminal" class="screen">
         <h1>Terminal</h1>
-        <button onclick="showScreen('main-menu')">Back to menu</button>
+        <button onclick="showScreen('main-menu')">Back to menu</button><hr />
         <input type="text" id="commandInput" placeholder="Enter command">
         <button onclick="sendATCommand()">Send Command</button>
         <pre id="terminalOutput"></pre>
@@ -131,7 +131,7 @@
     <!-- DFU Screen -->
     <div id="dfu" class="screen">
         <h1>DFU</h1>
-        <button onclick="showScreen('main-menu')">Back to menu</button>
+        <button onclick="showScreen('main-menu')">Back to menu</button><hr />
         <input type="file" id="dfuFileInput">
         <button onclick="sendDFUPacket()">Send DFU Packet</button>
     </div>
@@ -139,7 +139,7 @@
     <!-- Security Screen -->
     <div id="security" class="screen">
         <h1>Security</h1>
-        <button onclick="showScreen('main-menu')">Back to menu</button>
+        <button onclick="showScreen('main-menu')">Back to menu</button><hr />
         <input type="text" id="securityInput" placeholder="Enter security data">
         <button onclick="sendSecurityPacket()">Send Security Packet</button>
     </div>
@@ -147,7 +147,7 @@
     <!-- Read/Write Screen -->
     <div id="read-write" class="screen">
         <h1>Read/Write</h1>
-        <button onclick="showScreen('main-menu')">Back to menu</button>
+        <button onclick="showScreen('main-menu')">Back to menu</button><hr />
         <input type="text" id="readInput" placeholder="Enter data to read">
         <button onclick="sendReadPacket()">Read</button>
         <input type="text" id="writeInput" placeholder="Enter data to write">
@@ -157,7 +157,7 @@
     <!-- Notify Screen -->
     <div id="notify" class="screen">
         <h1>Notify</h1>
-        <button onclick="showScreen('main-menu')">Back to menu</button>
+        <button onclick="showScreen('main-menu')">Back to menu</button><hr />
         <input type="text" id="notifyInput" placeholder="Enter notify data">
         <button onclick="sendNotifyPacket()">Send Notify Packet</button>
     </div>
@@ -165,7 +165,7 @@
     <!-- Scan Screen -->
     <div id="scan" class="screen">
         <h1>Scan</h1>
-        <button onclick="showScreen('main-menu')">Back to menu</button>
+        <button onclick="showScreen('main-menu')">Back to menu</button><hr />
         <button onclick="sendScanPacket()">Send Scan Packet</button>
     </div>
 
@@ -173,7 +173,7 @@
     <div id="iopin" class="screen">
         <h1>IO Pin</h1>
         <input type="text" id="ioPinInput" placeholder="Enter IO Pin data">
-        <button onclick="showScreen('main-menu')">Back to menu</button>
+        <button onclick="showScreen('main-menu')">Back to menu</button><hr />
         <button onclick="sendIOPinPacket()">Send IO Pin Packet</button>
         <!-- add firmata flavour choice, specifically the BLEfirmata from arduino versus others -->
 
@@ -182,7 +182,7 @@
     <!-- Neopixel Screen -->
     <div id="neopixel" class="screen">
         <h1>Neopixel</h1>
-        <button onclick="showScreen('main-menu')">Back to menu</button>
+        <button onclick="showScreen('main-menu')">Back to menu</button><hr />
         <!-- future load from browser localstorage the last used neopixel matrix/strand/shape -->
         <!-- also support json export + draggable pixels / drawable polyline  -->
         <input type="text" id="neopixelInput" placeholder="Enter Neopixel data">
@@ -192,7 +192,7 @@
     <!-- String Screen -->
     <div id="string" class="screen">
         <h1>String</h1>
-        <button onclick="showScreen('main-menu')">Back to menu</button>
+        <button onclick="showScreen('main-menu')">Back to menu</button><hr />
         <input type="text" id="stringInput" placeholder="Enter string">
         <button onclick="sendStringPacket()">Send String Packet</button>
     </div>
@@ -200,7 +200,7 @@
     <!-- Raw Data Screen -->
     <div id="raw" class="screen">
         <h1>Raw Data</h1>
-        <button onclick="showScreen('main-menu')">Back to menu</button>
+        <button onclick="showScreen('main-menu')">Back to menu</button><hr />
         <input type="text" id="rawBytesInput" placeholder="Enter raw bytes (comma-separated)">
         <button onclick="sendRawBytes()">Send Raw Bytes</button>
         <input type="text" id="rawStringInput" placeholder="Enter raw string">
@@ -210,7 +210,7 @@
     <!-- Location Screen -->
     <div id="location" class="screen">
         <h1>Location</h1>
-        <button onclick="showScreen('main-menu')">Back to menu</button>
+        <button onclick="showScreen('main-menu')">Back to menu</button><hr />
         <input type="text" id="latitudeInput" placeholder="Enter latitude">
         <input type="text" id="longitudeInput" placeholder="Enter longitude">
         <button onclick="sendLocation()">Send Location</button>

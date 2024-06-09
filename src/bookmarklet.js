@@ -1,11 +1,17 @@
 (function() {
     console.log('Bookmarklet loaded');
     
-    // Create a link element for CSS
-    var link = document.createElement("link");
-    link.rel = "stylesheet";
-    link.href = "https://cdn.jsdelivr.net/gh/tyeth/serialfruit-connect@v0.0.86/src/style.css";
-    document.head.appendChild(link);
+    // Create a container element
+    var container = document.createElement("div");
+    container.id = "serialfruit-container";
+    document.body.appendChild(container);
+    console.log('Container created');
+
+    // Create a style element for CSS
+    var style = document.createElement("style");
+    style.scoped = true;
+    style.textContent = "@import url('https://cdn.jsdelivr.net/gh/tyeth/serialfruit-connect@v0.0.86/src/style.css');";
+    container.appendChild(style);
     console.log('CSS loaded');
 
     // Create a script element for the JavaScript
@@ -18,7 +24,7 @@
         var panel = document.createElement("div");
         panel.id = "serialfruit-body";
         panel.style.cssText = "position:fixed;top:0;right:-300px;width:300px;height:100%;background:#fff;box-shadow:-2px 0 5px rgba(0,0,0,0.5);transition:right 0.3s;z-index:10000;overflow:auto;";
-        document.body.appendChild(panel);
+        container.appendChild(panel);
         console.log('Panel created');
         
         // Add the content from your index.html to the panel

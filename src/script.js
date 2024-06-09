@@ -275,7 +275,6 @@ async function updateStatsTable() {
             returnedDeviceAndStates = ['No tracked sockets', 'Disconnected']
         } else {
             trackedSockets.forEach((ws) => {
-                let deviceElement, stateElement;
                 if (ws instanceof WebSocket) {
                     deviceTextContents = ws.url;
                     switch (ws.readyState) {
@@ -315,8 +314,9 @@ async function updateStatsTable() {
                 statsTableBody.removeChild(statsTableBody.firstChild);
             }
 
-            returnedDeviceAndStates.forEach((deviceTextContents, stateTextContents) => {
-
+            returnedDeviceAndStates.forEach((item) => {
+                const deviceTextContents = item[0];
+                const stateTextContents = item[1];
                 // Create a new row for each device
                 const newRow = document.createElement('tr');
                 const deviceCell = document.createElement('td');

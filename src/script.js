@@ -166,6 +166,10 @@ async function connectAnySerial() {
     if (writer) return;
     if (webworkflow_serial || web_usb_serial) {
         //setup textencoder for writer to websocket
+        if (!window?.serialfruit?.getTrackedSockets) {
+            console.error('WebSocket/Serialport/BLE tracking not enabled, enabling now...');
+            await ensureEverythingHooked();
+        }
         activeWebSocket = window.serialfruit.getTrackedSockets().find((ws) => ws.readyState === 1);
         if (activeWebSocket) {
             writer = {
@@ -209,13 +213,17 @@ async function connectSerial() {
         port = await navigator.serial.requestPort();
         await port.open({ baudRate: 115200 });
         writer = port.writable.getWriter();
+        //TODO: refactor into ensureHooked so all transports setup trackedSockets array + func
+        window.serialfruit._trackedSockets = window.serialfruit._trackedSockets || [];
+        window.serialfruit.getTrackedSockets = window.serialfruit.getTrackedSockets || function () { return window.serialfruit._trackedSockets; };
+        window.serialfruit._trackedSockets.push(port);
         console.log("Connected to serial port", port);
     } catch (error) {
         console.error("Failed to connect to serial port: ", error);
     }
 }
 
-async function ensureWebsocketsHooked() {
+async function ensureEverythingHooked() {
     // monkey patch websockets to allow reuse
     if (window.serialfruit.getTrackedSockets) {
         console.log('WebSocket tracking already enabled.');
@@ -271,7 +279,7 @@ async function updateStatsTable() {
         const deviceElement = document.getElementById('web-serial-device');
         const stateElement = document.getElementById('web-serial-state');
         let returnedDeviceAndStates = [];
-        if (!trackedSockets) {
+        if (!trackedSockets || trackedSockets.length === 0) {
             returnedDeviceAndStates = ['No tracked sockets', 'Disconnected']
         } else {
             trackedSockets.forEach((ws) => {
@@ -294,8 +302,14 @@ async function updateStatsTable() {
                             stateTextContents = ws.readyState;
                     }
                 } else if (ws instanceof SerialPort) {
-                    deviceTextContents = "Uart:" + ws.name;
-                    stateTextContents = ws.readable && ws.writable ? 'open' : 'closed';
+                    let deviceInfo = SerialPort.prototype.getInfo.call(ws);
+                    let deviceName = "Unknown Device";
+                    if (deviceInfo && deviceInfo.hasOwnProperty('usbProductId') && deviceInfo.hasOwnProperty('usbVendorId')) {
+                        deviceName = `Vid:${deviceInfo.usbVendorId} Pid:${deviceInfo.usbProductId}`;
+                    }
+                    deviceTextContents = "Uart: " + deviceName;
+                    stateTextContents = ws.connected && ws.readable && ws.writable ? 'open' : 'closed';
+                    // TODO: remove serialport connection from stats if closed and other connections available
                 } else if (ws instanceof BluetoothDevice) {
                     deviceTextContents = "BT:" + ws.name;
                     stateTextContents = ws.gatt.connected ? 'open' : 'closed';
@@ -338,9 +352,9 @@ async function updateStatsTable() {
 // Ensure access to serial port and writer
 async function ensureAddressAndSocketAccess() {
     if (window.location.host.match(/^((192.168)|(cpy-))/i)) {
-        webworkflow_serial = true;
         if (window.location.pathname.endsWith('cp/serial')) {
-            ensureWebsocketsHooked();
+            webworkflow_serial = true;
+            ensureEverythingHooked();
             debugger;
             activeWebSocket = activeWebSocket || null;
             activeWebSocket = activeWebSocket || new WebSocket('ws://' + window.location.host + '/ws/serial');
@@ -349,8 +363,9 @@ async function ensureAddressAndSocketAccess() {
             // console.log('Packet sent:', packet.toArray());
             return;
         } else if (window.location.pathname == "/code/") {
+            webworkflow_serial = true;
             if (!window.serialfruit?.getTrackedSockets) {
-                ensureWebsocketsHooked();
+                ensureEverythingHooked();
             
                 // check if device connected state on page and reconnect
                 let connectButton = [...document.querySelectorAll('button.btn-connect')];
@@ -464,7 +479,7 @@ async function ensureAddressAndSocketAccess() {
         // check if device connected state on page
         if (document.querySelector('div#options').classList.contains('start')) {
             console.log('Device not connected, connecting...');
-            ensureWebsocketsHooked();
+            ensureEverythingHooked();
             document.querySelector('#options > fieldset > button').click();
         } else {
             if (!window.serialfruit || !window.serialfruit._trackedSockets) {

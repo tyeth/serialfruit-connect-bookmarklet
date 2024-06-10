@@ -9,8 +9,8 @@
 
     // Create a style element for CSS
     var style = document.createElement("style");
-    style.scoped = true;
     style.textContent = "@import url('https://cdn.jsdelivr.net/gh/tyeth/serialfruit-connect@v0.0.88/src/style.css');";
+    style.setAttributeNode(document.createAttribute("scoped"));
     container.appendChild(style);
     console.log('CSS loaded');
 

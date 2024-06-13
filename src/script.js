@@ -348,6 +348,12 @@ async function updateStatsTable() {
     }
 }
 
+async function getVisibleButton(selector) {
+    let buttons = [...document.querySelectorAll(selector)];
+    buttons = buttons.filter((x) => x.offsetHeight !== 0);
+    return Array.isArray(buttons) ? buttons[0] : buttons;
+}
+
 
 // Ensure access to serial port and writer
 async function ensureAddressAndSocketAccess() {
@@ -368,18 +374,18 @@ async function ensureAddressAndSocketAccess() {
                 ensureEverythingHooked();
             
                 // check if device connected state on page and reconnect
-                let connectButton = [...document.querySelectorAll('button.btn-connect')];
-                connectButton = connectButton.filter((x) => x.offsetHeight !== 0);
-                connectButton = Array.isArray(connectButton) ? connectButton[0] : connectButton;
+                let connectButton = getVisibleButton('button.btn-connect');
                 if (connectButton) {
                     if (connectButton.innerText === 'Disconnect') {
                         console.log('Device already connected, disconnecting first');
                         connectButton.click();
                         setTimeout(() => {
                             console.log('Reconnecting device');
-                            let cButton = [...document.querySelectorAll('button.btn-connect')];
-                            cButton = cButton.filter((x) => x.offsetHeight !== 0);
-                            cButton = Array.isArray(cButton) ? cButton[0] : cButton;
+                            let cButton = getVisibleButton('button.btn-connect');
+                            if (!cButton) {
+                                console.error('Visible "Connect" button not found');
+                                return;
+                            }
                             cButton.click();
                             setTimeout(() => {
                                 //button#web-workflow click
@@ -395,7 +401,7 @@ async function ensureAddressAndSocketAccess() {
                                     });
                                     wModal.dispatchEvent(focusInEvent);
                                     console.log('FocusIn event dispatched on modal');
-                                    let wButton = document.querySelector('button#web-workflow');
+                                    let wButton = getVisibleButton('button#web-workflow');
                                     if (wButton){
                                         let focusInEvent = new FocusEvent('focusin', {
                                             view: wButton.ownerDocument.defaultView,

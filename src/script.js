@@ -379,7 +379,7 @@ async function ensureAddressAndSocketAccess() {
                             console.log('Reconnecting device');
                             let cButton = [...document.querySelectorAll('button.btn-connect')];
                             cButton = cButton.filter((x) => x.offsetHeight !== 0);
-                            cButton = cButton.length > 1 ? cButton[0] : cButton;
+                            cButton = Array.isArray(cButton) ? cButton[0] : cButton;
                             cButton.click();
                             setTimeout(() => {
                                 //button#web-workflow click

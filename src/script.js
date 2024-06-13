@@ -372,7 +372,7 @@ async function ensureAddressAndSocketAccess() {
                 connectButton = connectButton.filter((x) => x.offsetHeight !== 0);
                 connectButton = connectButton.length > 1 ? connectButton[0] : connectButton;
                 if (connectButton) {
-                    if (connectButton.textContent === 'Disconnect') {
+                    if (connectButton.innerText === 'Disconnect') {
                         console.log('Device already connected, disconnecting first');
                         connectButton.click();
                         setTimeout(() => {

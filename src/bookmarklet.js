@@ -9,14 +9,14 @@
 
     // Create a style element for CSS
     var style = document.createElement("style");
-    style.textContent = "@import url('https://cdn.jsdelivr.net/gh/tyeth/serialfruit-connect@v0.0.92/src/style.css');";
+    style.textContent = "@import url('https://cdn.jsdelivr.net/gh/tyeth/serialfruit-connect@v0.0.93/src/style.css');";
     style.setAttributeNode(document.createAttribute("scoped"));
     container.appendChild(style);
     console.log('CSS loaded');
 
     // Create a script element for the JavaScript
     var script = document.createElement("script");
-    script.src = "https://cdn.jsdelivr.net/gh/tyeth/serialfruit-connect@v0.0.92/src/script.js";
+    script.src = "https://cdn.jsdelivr.net/gh/tyeth/serialfruit-connect@v0.0.93/src/script.js";
     script.onload = function() {
         console.log('Script loaded');
         
@@ -28,7 +28,7 @@
         console.log('Panel created');
         
         // Add the content from your index.html to the panel
-        fetch("https://cdn.jsdelivr.net/gh/tyeth/serialfruit-connect@v0.0.92/src/index.html")
+        fetch("https://cdn.jsdelivr.net/gh/tyeth/serialfruit-connect@v0.0.93/src/index.html")
             .then(response => response.text())
             .then(html => {
                 panel.innerHTML = html + panel.innerHTML;

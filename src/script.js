@@ -348,7 +348,35 @@ async function updateStatsTable() {
     }
 }
 
-async function getVisibleButton(selector) {
+async function asyncAwaitVisibleElement(selector, timeout=15000) {
+    return new Promise((resolve, reject) => {
+        let elements = document.querySelectorAll(selector);
+        elements = Array.from(elements).filter((x) => x.offsetHeight !== 0);
+        if (elements.length > 0) {
+            resolve(elements[0]);
+        } else {
+            const observer = new MutationObserver((mutationsList, observer) => {
+                elements = document.querySelectorAll(selector);
+                elements = Array.from(elements).filter((x) => x.offsetHeight !== 0);
+                if (elements.length > 0) {
+                    observer.disconnect();
+                    clearTimeout(timeoutId); // Clear the timeout
+                    resolve(elements[0]);
+                }
+            });
+            observer.observe(document.body, { childList: true, subtree: true });
+
+            // Set a timeout to reject the promise if the element is not found within the specified time
+            const timeoutId = setTimeout(() => {
+                observer.disconnect(); // Stop observing if timeout
+                console.error('Element not found within timeout:', selector);
+                resolve(null);
+            }, timeout);
+        }
+    });
+}
+
+async function getVisibleElement(selector) {
     let buttons = [...document.querySelectorAll(selector)];
     buttons = buttons.filter((x) => x.offsetHeight !== 0);
     return Array.isArray(buttons) ? buttons[0] : buttons;
@@ -371,28 +399,28 @@ async function ensureAddressAndSocketAccess() {
         } else if (window.location.pathname == "/code/") {
             webworkflow_serial = true;
             if (!window.serialfruit?.getTrackedSockets) {
-                ensureEverythingHooked();
+                await ensureEverythingHooked();
             
                 // check if device connected state on page and reconnect
-                let connectButton = getVisibleButton('button.btn-connect');
+                let connectButton = await getVisibleElement('button.btn-connect');
                 if (connectButton) {
                     if (connectButton.innerText === 'Disconnect') {
                         console.log('Device already connected, disconnecting first');
                         connectButton.click();
-                        setTimeout(() => {
+                        setTimeout(async () => {
                             console.log('Reconnecting device');
-                            let cButton = getVisibleButton('button.btn-connect');
+                            let cButton = await asyncAwaitVisibleElement('button.btn-connect', 5000);
                             if (!cButton) {
                                 console.error('Visible "Connect" button not found');
                                 return;
                             }
                             cButton.click();
-                            setTimeout(() => {
+                            setTimeout(async () => {
                                 //button#web-workflow click
                                 console.log('Triggering button#web-workflow with event');
                                 // first trigger focusIn on <div class="popup-modal shadow prompt closable is--visible" 
                                 // and on button#web-workflow
-                                let wModal = document.querySelector('div.popup-modal.is--visible[data-popup-modal="connection-type"]');
+                                let wModal = await asyncAwaitVisibleElement('div.popup-modal.is--visible[data-popup-modal="connection-type"]');
                                 if (wModal){
                                     let focusInEvent = new FocusEvent('focusin', {
                                         view: wModal.ownerDocument.defaultView,
@@ -401,7 +429,7 @@ async function ensureAddressAndSocketAccess() {
                                     });
                                     wModal.dispatchEvent(focusInEvent);
                                     console.log('FocusIn event dispatched on modal');
-                                    let wButton = getVisibleButton('button#web-workflow');
+                                    let wButton = await asyncAwaitVisibleElement('button#web-workflow');
                                     if (wButton){
                                         let focusInEvent = new FocusEvent('focusin', {
                                             view: wButton.ownerDocument.defaultView,

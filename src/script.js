@@ -280,7 +280,7 @@ async function updateStatsTable() {
         const stateElement = document.getElementById('web-serial-state');
         let returnedDeviceAndStates = [];
         if (!trackedSockets || trackedSockets.length === 0) {
-            returnedDeviceAndStates = ['No tracked sockets', 'Disconnected']
+            returnedDeviceAndStates.push(['No tracked sockets', 'Disconnected'])
         } else {
             trackedSockets.forEach((ws) => {
                 if (ws instanceof WebSocket) {

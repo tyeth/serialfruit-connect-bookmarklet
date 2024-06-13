@@ -370,7 +370,7 @@ async function ensureAddressAndSocketAccess() {
                 // check if device connected state on page and reconnect
                 let connectButton = [...document.querySelectorAll('button.btn-connect')];
                 connectButton = connectButton.filter((x) => x.offsetHeight !== 0);
-                connectButton = Array.isArray(connectAnySerial) ? connectButton[0] : connectButton;
+                connectButton = Array.isArray(connectButton) ? connectButton[0] : connectButton;
                 if (connectButton) {
                     if (connectButton.innerText === 'Disconnect') {
                         console.log('Device already connected, disconnecting first');

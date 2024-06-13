@@ -309,7 +309,7 @@ async function updateStatsTable() {
                     }
                     deviceTextContents = "Uart: " + deviceName;
                     stateTextContents = ws.connected && ws.readable && ws.writable ? 'open' : 'closed';
-                    // TODO: remove serialport connection from stats if closed and other connections available
+                    // TODO: remove serialport connection from stats if closed and other connections available, also handle PolyFill
                 } else if (ws instanceof BluetoothDevice) {
                     deviceTextContents = "BT:" + ws.name;
                     stateTextContents = ws.gatt.connected ? 'open' : 'closed';

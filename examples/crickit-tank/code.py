@@ -17,7 +17,7 @@ import re
 import supervisor
 import sys
 import time
-
+# sys.exit(0)
 # from board_definitions import adafruit_matrixportal_s3 as board
 import board
 
@@ -45,6 +45,8 @@ from adafruit_bluefruit_connect.packet import Packet
 from adafruit_bluefruit_connect.button_packet import ButtonPacket
 from adafruit_bluefruit_connect.color_packet import ColorPacket
 
+fake_blue=False
+
 # Feather nRF52840 Express
 if board.board_id == "adafruit_feather_nrf52840_express":
     print("Using Feather nRF52840 Express")
@@ -56,8 +58,14 @@ if board.board_id == "adafruit_feather_nrf52840_express":
 
 elif board.board_id == "adafruit_feather_esp32s2_tft":
     print("Using Feather ESP32-S2 TFT")
-    # Prep the status LEDs on the Feather
+    fake_blue=True
+elif board.board_id == "adafruit_feather_esp32_v2":
+    print("Using Feather ESP32v2")
+    fake_blue=True
     
+    
+# Prep the status LEDs on the Feather
+if fake_blue:    
     #create fake object for blue LED that has a value Property that can be set and alters the onboard neopixel like a fake LED
     class fakeLED:
         def __init__(self):
@@ -311,3 +319,5 @@ while True:
         else:
             if DEBUG:
                 print("No packet received")
+
+

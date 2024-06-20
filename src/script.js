@@ -236,23 +236,17 @@ class SerialFruit {
             }
             self._trackedSockets.push(port);
             console.log("Serial port opened and writer/reader tracked:", port);
+
+            const originalGetWriter = port.writable.getWriter.bind(port.writable);
+            port.writable.getWriter = function() {
+                return self._writer || (self._writer = originalGetWriter());
+            };
+
+            const originalGetReader = port.readable.getReader.bind(port.readable);
+            port.readable.getReader = function() {
+                return self._reader || (self._reader = originalGetReader());
+            };
         }.bind(this);
-
-        const originalGetWriter = port.writable.getWriter.bind(port.writable);
-        port.writable.getWriter = function() {
-            if (!self._writer) {
-                self._writer = originalGetWriter();
-            }
-            return self._writer;
-        };
-
-        const originalGetReader = port.readable.getReader.bind(port.readable);
-        port.readable.getReader = function() {
-            if (!self._reader) {
-                self._reader = originalGetReader();
-            }
-            return self._reader;
-        };
     }
 
     async ensureEverythingHooked() {

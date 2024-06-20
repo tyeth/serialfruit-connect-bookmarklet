@@ -141,8 +141,9 @@ _(You may need to add the `javascript:` prefix back into the address bar after p
 ```
 mkcert --install
 ```
-2. use vscode launch tasks to run python server task and it will copy all /src files and mangle them to localhost
-3. use the bookmarklet code printed in the console at server startup instead, which will be similar to:
+2. install dependencies for updating tags/refs and watchdog server: `pip install bs4 semver watchdog`
+3. use `python watching-server.py` or the vscode launch tasks to run python server task and it will copy all /src files and mangle them to localhost
+4. use the bookmarklet code printed in the console at server startup instead, which will be similar to:
 ```javascript
 javascript:(function(){var script=document.createElement('script');script.src='https://192.168.43.244:4443/localhost-src/bookmarklet.js';document.body.appendChild(script);})();
 ```

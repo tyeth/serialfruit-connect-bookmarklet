@@ -4,11 +4,12 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+
         {
             "name": "Python: HTTPS Server",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/test-https-server.py",
+            "program": "${workspaceFolder}/watching-server.py",
             "console": "integratedTerminal",
             "args": [
                 // "-c",

@@ -162,6 +162,9 @@ class SerialFruit {
         // Initialize global variables for serial port and writer
         this._port = null;
         this._writer = null;
+        this._reader = null;
+        this._writerQueue = [];
+        this._writerBusy = false;
         this._webworkflow_serial = false;
         this._ble_serial = false;
         this._web_usb_serial = false;
@@ -180,7 +183,7 @@ class SerialFruit {
     }
 
     cleanTrackedSockets() {
-        this._trackedSockets = this._trackedSockets.filter(x => 
+        this._trackedSockets = this._trackedSockets.filter(x =>
             (x instanceof WebSocket && x.readyState === 1) ||
             (x instanceof SerialPort && x.readable && x.writable) ||
             (x instanceof BluetoothDevice && x.gatt.connected)
@@ -218,16 +221,38 @@ class SerialFruit {
         }
     }
 
-    // Proxy for serial port to track writer
+    // Proxy for serial port to track writer and reader
     proxySerialPort(port) {
         const originalOpen = port.open;
+        const self = this;
 
         port.open = async function() {
             await originalOpen.apply(port, arguments);
-            this._writer = port.writable.getWriter();
-            this._trackedSockets.push(port);
-            console.log("Serial port opened and writer tracked:", port);
+            if (!self._writer) {
+                self._writer = port.writable.getWriter();
+            }
+            if (!self._reader) {
+                self._reader = port.readable.getReader();
+            }
+            self._trackedSockets.push(port);
+            console.log("Serial port opened and writer/reader tracked:", port);
         }.bind(this);
+
+        const originalGetWriter = port.writable.getWriter.bind(port.writable);
+        port.writable.getWriter = function() {
+            if (!self._writer) {
+                self._writer = originalGetWriter();
+            }
+            return self._writer;
+        };
+
+        const originalGetReader = port.readable.getReader.bind(port.readable);
+        port.readable.getReader = function() {
+            if (!self._reader) {
+                self._reader = originalGetReader();
+            }
+            return self._reader;
+        };
     }
 
     async ensureEverythingHooked() {
@@ -254,7 +279,7 @@ class SerialFruit {
         } else {
             const originalWebSocket = window.WebSocket;
             const trackedSockets = [];
-            
+
             function TrackingWebSocket(url, protocols) {
                 const ws = new originalWebSocket(url, protocols);
                 trackedSockets.push(ws);
@@ -264,19 +289,19 @@ class SerialFruit {
 
             TrackingWebSocket.prototype = originalWebSocket.prototype;
             window.WebSocket = TrackingWebSocket;
-            
+
             window.serialfruit.getTrackedSockets = function() {
                 return trackedSockets;
             };
             window.serialfruit.cleanTrackedSockets = function() {
-                trackedSockets = trackedSockets.filter(x => 
+                trackedSockets = trackedSockets.filter(x =>
                     (x instanceof WebSocket && x.readyState === 1) ||
                     (x instanceof SerialPort && x.readable && x.writable) ||
                     (x instanceof BluetoothDevice && x.gatt.connected)
                 );
             };
             window.serialfruit._trackedSockets = trackedSockets;
-            
+
             console.log('WebSocket tracking enabled.');
         }
     }
@@ -329,6 +354,7 @@ class SerialFruit {
             this._port = await navigator.serial.requestPort();
             await this._port.open({ baudRate: 115200 });
             this._writer = this._port.writable.getWriter();
+            this._reader = this._port.readable.getReader();
             this._trackedSockets.push(this._port);
             console.log("Connected to serial port", this._port);
         } catch (error) {
@@ -578,20 +604,42 @@ class SerialFruit {
         try {
             // if already Uint8Array, just send it
             if (packet instanceof Uint8Array) {
-                await this._writer.write(packet);
+                await this.writeToPort(packet);
                 console.log("Successfully sent packet:", packet);
             } else if (packet instanceof BluefruitPacket) {
-                await this._writer.write(packet.toBytes());
+                await this.writeToPort(packet.toBytes());
                 console.log("Successfully sent packet:", packet.toBytes());
             } else {
                 // assume it's a string
                 const packetArray = new TextEncoder().encode(packet);
-                await this._writer.write(packetArray);
+                await this.writeToPort(packetArray);
                 console.log("Successfully sent packet:", packetArray);
             }
         } catch (error) {
             console.error("Failed to send packet: ", error);
         }
+    }
+
+    async writeToPort(data) {
+        return new Promise((resolve, reject) => {
+            this._writerQueue.push({ data, resolve, reject });
+            this.processWriterQueue();
+        });
+    }
+
+    async processWriterQueue() {
+        if (this._writerBusy) return;
+        this._writerBusy = true;
+        while (this._writerQueue.length > 0) {
+            const { data, resolve, reject } = this._writerQueue.shift();
+            try {
+                await this._writer.write(data);
+                resolve();
+            } catch (error) {
+                reject(error);
+            }
+        }
+        this._writerBusy = false;
     }
 
     async sendColor() {

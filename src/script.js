@@ -241,26 +241,33 @@ class SerialFruit {
             port.writable.getWriter = function() {
                 return self._writer || (self._writer = originalGetWriter());
             };
+            // port.writable.pipeTo = self._writer.pipeTo.bind(self._writer);
+            // port.writable.pipeThrough = self._writer.pipeThrough.bind(self._writer);
+
 
             const originalGetReader = port.readable.getReader.bind(port.readable);
             port.readable.getReader = function() {
                 return self._reader || (self._reader = originalGetReader());
             };
+            port.readable.pipeTo = ReadableStream.prototype.pipeTo.bind(port.readable);
+            port.readable.pipeThrough = ReadableStream.prototype.pipeThrough.bind(port.readable);
+
         }.bind(this);
     }
 
     createWritableProxy(writable) {
         const writer = writable.getWriter();
-        return {
-            write: (data) => writer.write(data),
-            close: () => writer.close(),
-            abort: (reason) => writer.abort(reason),
-            releaseLock: () => writer.releaseLock(),
-            locked: writer.locked,
-            desiredSize: writer.desiredSize,
-            pipeTo: writer.pipeTo.bind(writer),
-            pipeThrough: writer.pipeThrough.bind(writer)
-        };
+        return writer;
+        // {
+        //     write: (data) => writer.write(data),
+        //     close: () => writer.close(),
+        //     abort: (reason) => writer.abort(reason),
+        //     releaseLock: () => writer.releaseLock(),
+        //     locked: writer.locked,
+        //     desiredSize: writer.desiredSize,
+        //     pipeTo: writer.pipeTo.bind(writer),
+        //     pipeThrough: writer.pipeThrough.bind(writer)
+        // };
     }
 
     createReadableProxy(readable) {

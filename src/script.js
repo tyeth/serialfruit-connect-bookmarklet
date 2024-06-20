@@ -229,10 +229,10 @@ class SerialFruit {
         port.open = async function() {
             await originalOpen.apply(port, arguments);
             if (!self._writer) {
-                self._writer = port.writable.getWriter();
+                self._writer = self.createWritableProxy(port.writable);
             }
             if (!self._reader) {
-                self._reader = port.readable.getReader();
+                self._reader = self.createReadableProxy(port.readable);
             }
             self._trackedSockets.push(port);
             console.log("Serial port opened and writer/reader tracked:", port);
@@ -247,6 +247,33 @@ class SerialFruit {
                 return self._reader || (self._reader = originalGetReader());
             };
         }.bind(this);
+    }
+
+    createWritableProxy(writable) {
+        const writer = writable.getWriter();
+        return {
+            write: (data) => writer.write(data),
+            close: () => writer.close(),
+            abort: (reason) => writer.abort(reason),
+            releaseLock: () => writer.releaseLock(),
+            locked: writer.locked,
+            desiredSize: writer.desiredSize,
+            pipeTo: writer.pipeTo.bind(writer),
+            pipeThrough: writer.pipeThrough.bind(writer)
+        };
+    }
+
+    createReadableProxy(readable) {
+        const reader = readable.getReader();
+        return {
+            read: () => reader.read(),
+            releaseLock: () => reader.releaseLock(),
+            cancel: (reason) => reader.cancel(reason),
+            closed: reader.closed,
+            pipeTo: reader.pipeTo ? reader.pipeTo.bind(reader) : undefined,
+            pipeThrough: reader.pipeThrough ? reader.pipeThrough.bind(reader) : undefined,
+            locked: reader.locked
+        };
     }
 
     async ensureEverythingHooked() {
@@ -347,8 +374,8 @@ class SerialFruit {
         try {
             this._port = await navigator.serial.requestPort();
             await this._port.open({ baudRate: 115200 });
-            this._writer = this._port.writable.getWriter();
-            this._reader = this._port.readable.getReader();
+            this._writer = this.createWritableProxy(this._port.writable);
+            this._reader = this.createReadableProxy(this._port.readable);
             this._trackedSockets.push(this._port);
             console.log("Connected to serial port", this._port);
         } catch (error) {

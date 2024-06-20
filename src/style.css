@@ -19,11 +19,16 @@
 #serialfruit-body * {
     padding: initial;
     margin: initial;
+    color: #000;
     /* font: initial; */
 }
 
 #serialfruit-body h1 {
     margin-bottom: 6px;
+    color: #000;
+}
+
+#serialfruit-body button {
     color: #000;
 }
 

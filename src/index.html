@@ -217,6 +217,20 @@
         <button onclick="getCurrentLocation()">Use Current Location</button>
     </div>
 
+    <!-- bluefruit-chart -->
+    <div id="bluefruit_chart" class="screen">
+        <h1>Bluefruit Chart</h1>
+        <button onclick="showScreen('main-menu')">Back to menu</button><hr />
+        <div id="chartContainer" style="height: 370px; width: 100%;"></div>
+    </div>
+
+    <!-- arduino-chart -->
+    <div id="arduino_chart" class="screen">
+        <h1>Arduino Chart</h1>
+        <button onclick="showScreen('main-menu')">Back to menu</button><hr />
+        <div id="arduinoChartContainer" style="height: 370px; width: 100%;"></div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/gh/tyeth/serialfruit-connect@v0.0.97/src/script.js"></script>
 </body>
 </html>

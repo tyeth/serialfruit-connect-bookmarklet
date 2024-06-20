@@ -54,31 +54,31 @@
         </div>
         <div class="buttons">
 
-            <button onclick="showScreen('color-picker')">Color Picker</button>
-            <button onclick="showScreen('control-pad')">Control Pad</button>
-            <button onclick="showScreen('accelerometer')">Accelerometer</button>
-            <button onclick="showScreen('location')">Location</button>
-            <!-- <button onclick="showScreen('security')">Security</button> -->
-            <button onclick="showScreen('neopixel')">Neopixel</button>
-            <button onclick="showScreen('bluefruit_chart')">BlueFruit Chart</button>
-            <button onclick="showScreen('arduino_chart')">Arduino Chart</button>
-            <button onclick="showScreen('iopin')">IO Pin</button>
-            <!-- <button onclick="showScreen('notify')">Notify</button>
-            <button onclick="showScreen('scan')">Scan</button>
-            <button onclick="showScreen('read-write')">Read/Write</button> -->
-            <button onclick="showScreen('string')">String</button>
-            <button onclick="showScreen('raw')">Raw Data</button>
-            <button onclick="showScreen('terminal')">Terminal</button>
-            <button onclick="showScreen('dfu')">DFU</button>
+            <button onclick="window.serialfruit.showScreen('color-picker')">Color Picker</button>
+            <button onclick="window.serialfruit.showScreen('control-pad')">Control Pad</button>
+            <button onclick="window.serialfruit.showScreen('accelerometer')">Accelerometer</button>
+            <button onclick="window.serialfruit.showScreen('location')">Location</button>
+            <!-- <button onclick="window.serialfruit.showScreen('security')">Security</button> -->
+            <button onclick="window.serialfruit.showScreen('neopixel')">Neopixel</button>
+            <button onclick="window.serialfruit.showScreen('bluefruit_chart')">BlueFruit Chart</button>
+            <button onclick="window.serialfruit.showScreen('arduino_chart')">Arduino Chart</button>
+            <button onclick="window.serialfruit.showScreen('iopin')">IO Pin</button>
+            <!-- <button onclick="window.serialfruit.showScreen('notify')">Notify</button>
+            <button onclick="window.serialfruit.showScreen('scan')">Scan</button>
+            <button onclick="window.serialfruit.showScreen('read-write')">Read/Write</button> -->
+            <button onclick="window.serialfruit.showScreen('string')">String</button>
+            <button onclick="window.serialfruit.showScreen('raw')">Raw Data</button>
+            <button onclick="window.serialfruit.showScreen('terminal')">Terminal</button>
+            <button onclick="window.serialfruit.showScreen('dfu')">DFU</button>
         </div>
     </div>
     
     <!-- Color Picker Screen -->
     <div id="color-picker" class="screen">
         <h1>Color Picker</h1>
-        <button onclick="showScreen('main-menu')">Back to menu</button><hr />
+        <button onclick="window.serialfruit.showScreen('main-menu')">Back to menu</button><hr />
         <input type="color" id="colorInput">
-        <button onclick="sendColor()">Send Color</button>
+        <button onclick="window.serialfruit.sendColor()">Send Color</button>
     </div>
 
     <!-- Control Pad Screen -->
@@ -86,26 +86,26 @@
         <h1>Control Pad</h1>
         <div>
 
-            <button onmousedown="sendButton(button=1,pressed=true, 'onmousedown')" onmouseup="sendButton(1,pressed=false, 'onmouseup')" onclick="sendButton(1,pressed=true, 'onclick')">1</button>
-            <button onmousedown="sendButton(button=2,pressed=true, 'onmousedown')" onmouseup="sendButton(2,pressed=false, 'onmouseup')" onclick="sendButton(2,pressed=true, 'onclick')">2</button>
-            <button onmousedown="sendButton(button=3,pressed=true, 'onmousedown')" onmouseup="sendButton(3,pressed=false, 'onmouseup')" onclick="sendButton(3,pressed=true, 'onclick')">3</button>
-            <button onmousedown="sendButton(button=4,pressed=true, 'onmousedown')" onmouseup="sendButton(4,pressed=false, 'onmouseup')" onclick="sendButton(4,pressed=true, 'onclick')">4</button>
+            <button onmousedown="window.serialfruit.showButton(button=1,pressed=true, 'onmousedown')" onmouseup="window.serialfruit.showButton(1,pressed=false, 'onmouseup')" onclick="window.serialfruit.showButton(1,pressed=true, 'onclick')">1</button>
+            <button onmousedown="window.serialfruit.showButton(button=2,pressed=true, 'onmousedown')" onmouseup="window.serialfruit.showButton(2,pressed=false, 'onmouseup')" onclick="window.serialfruit.showButton(2,pressed=true, 'onclick')">2</button>
+            <button onmousedown="window.serialfruit.showButton(button=3,pressed=true, 'onmousedown')" onmouseup="window.serialfruit.showButton(3,pressed=false, 'onmouseup')" onclick="window.serialfruit.showButton(3,pressed=true, 'onclick')">3</button>
+            <button onmousedown="window.serialfruit.showButton(button=4,pressed=true, 'onmousedown')" onmouseup="window.serialfruit.showButton(4,pressed=false, 'onmouseup')" onclick="window.serialfruit.showButton(4,pressed=true, 'onclick')">4</button>
         </div>
         <div>
             <div>
-                <button onclick="showScreen('main-menu')">Back to menu</button><hr />
+                <button onclick="window.serialfruit.showScreen('main-menu')">Back to menu</button><hr />
             </div>
             <div class="gamepad">
-                <button class="btn-up" onmousedown="sendButton(button=5,pressed=true, 'onmousedown')" onmouseup="sendButton(5,pressed=false, 'onmouseup')" onclick="sendButton(button=5,pressed=true, 'onclick')">Up</button>
-                <button class="btn-down" onmousedown="sendButton(button=6,pressed=true, 'onmousedown')" onmouseup="sendButton(6,pressed=false, 'onmouseup')" onclick="sendButton(button=6,pressed=true, 'onclick')">Down</button>
-                <button class="btn-left" onmousedown="sendButton(button=7,pressed=true, 'onmousedown')" onmouseup="sendButton(7,pressed=false, 'onmouseup')" onclick="sendButton(button=7,pressed=true, 'onclick')">Left</button>
-                <button class="btn-right" onmousedown="sendButton(button=8,pressed=true, 'onmousedown')" onmouseup="sendButton(8,pressed=false, 'onmouseup')" onclick="sendButton(button=8,pressed=true, 'onclick')">Right</button>
+                <button class="btn-up" onmousedown="window.serialfruit.showButton(button=5,pressed=true, 'onmousedown')" onmouseup="window.serialfruit.showButton(5,pressed=false, 'onmouseup')" onclick="window.serialfruit.showButton(button=5,pressed=true, 'onclick')">Up</button>
+                <button class="btn-down" onmousedown="window.serialfruit.showButton(button=6,pressed=true, 'onmousedown')" onmouseup="window.serialfruit.showButton(6,pressed=false, 'onmouseup')" onclick="window.serialfruit.showButton(button=6,pressed=true, 'onclick')">Down</button>
+                <button class="btn-left" onmousedown="window.serialfruit.showButton(button=7,pressed=true, 'onmousedown')" onmouseup="window.serialfruit.showButton(7,pressed=false, 'onmouseup')" onclick="window.serialfruit.showButton(button=7,pressed=true, 'onclick')">Left</button>
+                <button class="btn-right" onmousedown="window.serialfruit.showButton(button=8,pressed=true, 'onmousedown')" onmouseup="window.serialfruit.showButton(8,pressed=false, 'onmouseup')" onclick="window.serialfruit.showButton(button=8,pressed=true, 'onclick')">Right</button>
             </div>
             <div class="gamepad gamepad-buttons">
-                <button class="btn-a" onmousedown="sendButton(button=1,pressed=true, 'onmousedown')" onmouseup="sendButton(1,pressed=false, 'onmouseup')" onclick="sendButton(1,pressed=true, 'click')">A</button>
-                <button class="btn-b" onmousedown="sendButton(button=2,pressed=true, 'onmousedown')" onmouseup="sendButton(2,pressed=false, 'onmouseup')" onclick="sendButton(2,pressed=true, 'click')">B</button>
-                <button class="btn-x" onmousedown="sendButton(button=3,pressed=true, 'onmousedown')" onmouseup="sendButton(3,pressed=false, 'onmouseup')" onclick="sendButton(3,pressed=true, 'click')">X</button>
-                <button class="btn-y" onmousedown="sendButton(button=4,pressed=true, 'onmousedown')" onmouseup="sendButton(4,pressed=false, 'onmouseup')" onclick="sendButton(4,pressed=true, 'click')">Y</button>
+                <button class="btn-a" onmousedown="window.serialfruit.showButton(button=1,pressed=true, 'onmousedown')" onmouseup="window.serialfruit.showButton(1,pressed=false, 'onmouseup')" onclick="window.serialfruit.showButton(1,pressed=true, 'click')">A</button>
+                <button class="btn-b" onmousedown="window.serialfruit.showButton(button=2,pressed=true, 'onmousedown')" onmouseup="window.serialfruit.showButton(2,pressed=false, 'onmouseup')" onclick="window.serialfruit.showButton(2,pressed=true, 'click')">B</button>
+                <button class="btn-x" onmousedown="window.serialfruit.showButton(button=3,pressed=true, 'onmousedown')" onmouseup="window.serialfruit.showButton(3,pressed=false, 'onmouseup')" onclick="window.serialfruit.showButton(3,pressed=true, 'click')">X</button>
+                <button class="btn-y" onmousedown="window.serialfruit.showButton(button=4,pressed=true, 'onmousedown')" onmouseup="window.serialfruit.showButton(4,pressed=false, 'onmouseup')" onclick="window.serialfruit.showButton(4,pressed=true, 'click')">Y</button>
             </div>
         </div>
         <!-- Add JoyStick.js in future -->
@@ -114,67 +114,67 @@
     <!-- Accelerometer Screen -->
     <div id="accelerometer" class="screen">
         <h1>Accelerometer</h1>
-        <button onclick="showScreen('main-menu')">Back to menu</button><hr />
-        <button onclick="toggleAccelerometer('browser')">Start/Stop Sending Browser based Accelerometer Data</button>
-        <button onclick="toggleAccelerometer('device')">Start/Stop Receiving Serial Device Data</button>
+        <button onclick="window.serialfruit.showScreen('main-menu')">Back to menu</button><hr />
+        <button onclick="window.serialfruit.toggleAccelerometer('browser')">Start/Stop Sending Browser based Accelerometer Data</button>
+        <button onclick="window.serialfruit.toggleAccelerometer('device')">Start/Stop Receiving Serial Device Data</button>
     </div>
 
     <!-- Terminal Screen -->
     <div id="terminal" class="screen">
         <h1>Terminal</h1>
-        <button onclick="showScreen('main-menu')">Back to menu</button><hr />
+        <button onclick="window.serialfruit.showScreen('main-menu')">Back to menu</button><hr />
         <input type="text" id="commandInput" placeholder="Enter command">
-        <button onclick="sendATCommand()">Send Command</button>
+        <button onclick="window.serialfruit.sendATCommand()">Send Command</button>
         <pre id="terminalOutput"></pre>
     </div>
 
     <!-- DFU Screen -->
     <div id="dfu" class="screen">
         <h1>DFU</h1>
-        <button onclick="showScreen('main-menu')">Back to menu</button><hr />
+        <button onclick="window.serialfruit.showScreen('main-menu')">Back to menu</button><hr />
         <input type="file" id="dfuFileInput">
-        <button onclick="sendDFUPacket()">Send DFU Packet</button>
+        <button onclick="window.serialfruit.sendDFUPacket()">Send DFU Packet</button>
     </div>
 
     <!-- Security Screen -->
     <div id="security" class="screen">
         <h1>Security</h1>
-        <button onclick="showScreen('main-menu')">Back to menu</button><hr />
+        <button onclick="window.serialfruit.showScreen('main-menu')">Back to menu</button><hr />
         <input type="text" id="securityInput" placeholder="Enter security data">
-        <button onclick="sendSecurityPacket()">Send Security Packet</button>
+        <button onclick="window.serialfruit.sendSecurityPacket()">Send Security Packet</button>
     </div>
 
     <!-- Read/Write Screen -->
     <div id="read-write" class="screen">
         <h1>Read/Write</h1>
-        <button onclick="showScreen('main-menu')">Back to menu</button><hr />
+        <button onclick="window.serialfruit.showScreen('main-menu')">Back to menu</button><hr />
         <input type="text" id="readInput" placeholder="Enter data to read">
-        <button onclick="sendReadPacket()">Read</button>
+        <button onclick="window.serialfruit.sendReadPacket()">Read</button>
         <input type="text" id="writeInput" placeholder="Enter data to write">
-        <button onclick="sendWritePacket()">Write</button>
+        <button onclick="window.serialfruit.sendWritePacket()">Write</button>
     </div>
 
     <!-- Notify Screen -->
     <div id="notify" class="screen">
         <h1>Notify</h1>
-        <button onclick="showScreen('main-menu')">Back to menu</button><hr />
+        <button onclick="window.serialfruit.showScreen('main-menu')">Back to menu</button><hr />
         <input type="text" id="notifyInput" placeholder="Enter notify data">
-        <button onclick="sendNotifyPacket()">Send Notify Packet</button>
+        <button onclick="window.serialfruit.sendNotifyPacket()">Send Notify Packet</button>
     </div>
 
     <!-- Scan Screen -->
     <div id="scan" class="screen">
         <h1>Scan</h1>
-        <button onclick="showScreen('main-menu')">Back to menu</button><hr />
-        <button onclick="sendScanPacket()">Send Scan Packet</button>
+        <button onclick="window.serialfruit.showScreen('main-menu')">Back to menu</button><hr />
+        <button onclick="window.serialfruit.sendScanPacket()">Send Scan Packet</button>
     </div>
 
     <!-- IO Pin Screen -->
     <div id="iopin" class="screen">
         <h1>IO Pin</h1>
         <input type="text" id="ioPinInput" placeholder="Enter IO Pin data">
-        <button onclick="showScreen('main-menu')">Back to menu</button><hr />
-        <button onclick="sendIOPinPacket()">Send IO Pin Packet</button>
+        <button onclick="window.serialfruit.showScreen('main-menu')">Back to menu</button><hr />
+        <button onclick="window.serialfruit.sendIOPinPacket()">Send IO Pin Packet</button>
         <!-- add firmata flavour choice, specifically the BLEfirmata from arduino versus others -->
 
     </div>
@@ -182,52 +182,52 @@
     <!-- Neopixel Screen -->
     <div id="neopixel" class="screen">
         <h1>Neopixel</h1>
-        <button onclick="showScreen('main-menu')">Back to menu</button><hr />
+        <button onclick="window.serialfruit.showScreen('main-menu')">Back to menu</button><hr />
         <!-- future load from browser localstorage the last used neopixel matrix/strand/shape -->
         <!-- also support json export + draggable pixels / drawable polyline  -->
         <input type="text" id="neopixelInput" placeholder="Enter Neopixel data">
-        <button onclick="sendNeopixelPacket()">Send Neopixel Packet</button>
+        <button onclick="window.serialfruit.sendNeopixelPacket()">Send Neopixel Packet</button>
     </div>
 
     <!-- String Screen -->
     <div id="string" class="screen">
         <h1>String</h1>
-        <button onclick="showScreen('main-menu')">Back to menu</button><hr />
+        <button onclick="window.serialfruit.showScreen('main-menu')">Back to menu</button><hr />
         <input type="text" id="stringInput" placeholder="Enter string">
-        <button onclick="sendStringPacket()">Send String Packet</button>
+        <button onclick="window.serialfruit.sendStringPacket()">Send String Packet</button>
     </div>
 
     <!-- Raw Data Screen -->
     <div id="raw" class="screen">
         <h1>Raw Data</h1>
-        <button onclick="showScreen('main-menu')">Back to menu</button><hr />
+        <button onclick="window.serialfruit.showScreen('main-menu')">Back to menu</button><hr />
         <input type="text" id="rawBytesInput" placeholder="Enter raw bytes (comma-separated)">
-        <button onclick="sendRawBytes()">Send Raw Bytes</button>
+        <button onclick="window.serialfruit.sendRawBytes()">Send Raw Bytes</button>
         <input type="text" id="rawStringInput" placeholder="Enter raw string">
-        <button onclick="sendRawString()">Send Raw String</button>
+        <button onclick="window.serialfruit.sendRawString()">Send Raw String</button>
     </div>
 
     <!-- Location Screen -->
     <div id="location" class="screen">
         <h1>Location</h1>
-        <button onclick="showScreen('main-menu')">Back to menu</button><hr />
+        <button onclick="window.serialfruit.showScreen('main-menu')">Back to menu</button><hr />
         <input type="text" id="latitudeInput" placeholder="Enter latitude">
         <input type="text" id="longitudeInput" placeholder="Enter longitude">
-        <button onclick="sendLocation()">Send Location</button>
-        <button onclick="getCurrentLocation()">Use Current Location</button>
+        <button onclick="window.serialfruit.sendLocation()">Send Location</button>
+        <button onclick="window.serialfruit.getCurrentLocation()">Use Current Location</button>
     </div>
 
     <!-- bluefruit-chart -->
     <div id="bluefruit_chart" class="screen">
         <h1>Bluefruit Chart</h1>
-        <button onclick="showScreen('main-menu')">Back to menu</button><hr />
+        <button onclick="window.serialfruit.showScreen('main-menu')">Back to menu</button><hr />
         <div id="chartContainer" style="height: 370px; width: 100%;"></div>
     </div>
 
     <!-- arduino-chart -->
     <div id="arduino_chart" class="screen">
         <h1>Arduino Chart</h1>
-        <button onclick="showScreen('main-menu')">Back to menu</button><hr />
+        <button onclick="window.serialfruit.showScreen('main-menu')">Back to menu</button><hr />
         <div id="arduinoChartContainer" style="height: 370px; width: 100%;"></div>
     </div>
 

@@ -18,7 +18,7 @@ class BluefruitPacket {
     }
 
     toBytes() {
-        const partialPacket = new Uint8Array([ ...this.packetType.split('').map(c => c.charCodeAt(0)), ...this.payload]);
+        const partialPacket = new Uint8Array([...this.packetType.split('').map(c => c.charCodeAt(0)), ...this.payload]);
         const checksum = this.checksum(partialPacket);
         return Uint8Array.from([...partialPacket, checksum]);
     }
@@ -87,12 +87,10 @@ class ButtonPacket extends BluefruitPacket {
     """Right Button."""
      */
     constructor(button, pressed) {
-        const payload = new Uint8Array(
-            [
-                ...String(button).split('').map(x=>x.charCodeAt(0)),
-                ...(pressed ? "1":"0").split('').map(y=>y.charCodeAt(0))
-            ]
-        );
+        const payload = new Uint8Array([
+            ...String(button).split('').map(x => x.charCodeAt(0)),
+            ...(pressed ? "1" : "0").split('').map(y => y.charCodeAt(0))
+        ]);
         super('!B', payload);
     }
 }
@@ -158,12 +156,23 @@ class TemperaturePacket extends BluefruitPacket {
     }
 }
 
-
 class SerialFruit {
     constructor() {
         this._trackedSockets = [];
         // Initialize global variables for serial port and writer
-        this._port, this._writer, this._webworkflow_serial, this._ble_serial, this._web_usb_serial, this._accelerometerEnabled = false;
+        this._port = null;
+        this._writer = null;
+        this._webworkflow_serial = false;
+        this._ble_serial = false;
+        this._web_usb_serial = false;
+        this._accelerometerEnabled = false;
+        this._activeWebSocket = null;
+        this.lastAccelerometerEventTimestamp = null;
+        setTimeout(async () => {
+            await window.serialfruit.polyfillSerial();
+            await window.serialfruit.rebindSerialFunctions();
+            await window.serialfruit.ensureEverythingHooked();
+        }, 100);
     }
 
     getTrackedSockets() {
@@ -171,77 +180,58 @@ class SerialFruit {
     }
 
     cleanTrackedSockets() {
-        this._trackedSockets = this._trackedSockets.filter((x) => (x instanceof WebSocket && x?.readyState == 1) ||
-            (x instanceof SerialPort && x?.readable && x?.writable) ||
-            (x instanceof BluetoothDevice && x?.gatt?.connected));
+        this._trackedSockets = this._trackedSockets.filter(x => 
+            (x instanceof WebSocket && x.readyState === 1) ||
+            (x instanceof SerialPort && x.readable && x.writable) ||
+            (x instanceof BluetoothDevice && x.gatt.connected)
+        );
     }
 
-        
-    
-    // Connect to serial or web serial (or eventually BLE serial)
-    async connectAnySerial() {
-        if (writer) return;
-        if (webworkflow_serial || web_usb_serial) {
-            //setup textencoder for writer to websocket
-            if (!window?.serialfruit?.getTrackedSockets) {
-                console.error('WebSocket/Serialport/BLE tracking not enabled, enabling now...');
-                await ensureEverythingHooked();
-            }
-            activeWebSocket = window.serialfruit.getTrackedSockets().find((ws) => ws.readyState === 1);
-            if (activeWebSocket) {
-                writer = {
-                    write: async (data) => {
-                        console.debug('Attempting to send packet after fetching websocket:', data);
-                        if (!activeWebSocket || activeWebSocket.readyState !== 1) {
-                            console.error("WebSocket not found or not connected, attempting to reget.");
-                            activeWebSocket = window.serialfruit.getTrackedSockets().find((ws) => ws.readyState === 1);
-                            if (!activeWebSocket) {
-                                console.debug('WebSocket refetch failed:', window.serialfruit.getTrackedSockets());
-                                debugger;
-                                console.error("WebSocket not found or not connected.");
-                                return;
-                            }
-                            console.log('WebSocket refetched:', activeWebSocket);
-                        }
-                        console.log('Sending packet:', data);
-                        // circuirpython websocket uses text based comms
-                        activeWebSocket.send(new TextDecoder('ascii',options={encoding:'ascii'}).decode(Uint8Array.from(data)));
-                        console.log('Packet(s) sent:', data);
-                    }
-                };
-            } else {
-                console.error("WebSocket not found or not connected.");
-            }
-        } else if (ble_serial) {
-            console.error("BLE serial not supported yet");
-        } else {
-            if ('serial' in navigator) {
-                console.log("Attempting to connect to serial port...");
-                await connectSerial();
-            } else {
-                console.error("Web USB-serial not supported, try a Chromium based browser like Chrome or Edge.");
-            }
+    // Polyfill for mobile compatibility
+    async polyfillSerial() {
+        if (!('serial' in navigator)) {
+            const { SerialPort } = await import('https://unpkg.com/web-serial-polyfill@0.5.0/dist/index.min.js');
+            window.navigator.serial = new SerialPort();
+            console.log("Web Serial API polyfilled for compatibility.");
         }
     }
 
-    // Connect to the serial port
-    async connectSerial() {
-        try {
-            this._port = await navigator.serial.requestPort();
-            await this._port.open({ baudRate: 115200 });
-            this._writer = this._port.writable.getWriter();
-            //TODO: refactor into ensureHooked so all transports setup trackedSockets array + func
-            window.serialfruit._trackedSockets = window.serialfruit._trackedSockets || [];
-            window.serialfruit.getTrackedSockets = window.serialfruit.getTrackedSockets || function () { return window.serialfruit._trackedSockets; };
-            window.serialfruit._trackedSockets.push(port);
-            console.log("Connected to serial port", port);
-        } catch (error) {
-            console.error("Failed to connect to serial port: ", error);
+    // Rebind serial port functions to custom proxies
+    async rebindSerialFunctions() {
+        if ('serial' in navigator) {
+            const originalRequestPort = navigator.serial.requestPort;
+            const originalGetPorts = navigator.serial.getPorts;
+
+            navigator.serial.requestPort = async function() {
+                this._port = await originalRequestPort.call(navigator.serial, arguments);
+                this.proxySerialPort(this._port);
+                return this._port;
+            }.bind(this);
+
+            navigator.serial.getPorts = async function() {
+                const ports = await originalGetPorts.call(navigator.serial, arguments);
+                ports.forEach(window.serialfruit.proxySerialPort.bind(this));
+                return ports;
+            }.bind(this);
+
+            console.log("Serial port functions rebound to proxies.");
         }
+    }
+
+    // Proxy for serial port to track writer
+    proxySerialPort(port) {
+        const originalOpen = port.open;
+
+        port.open = async function() {
+            await originalOpen.apply(port, arguments);
+            this._writer = port.writable.getWriter();
+            this._trackedSockets.push(port);
+            console.log("Serial port opened and writer tracked:", port);
+        }.bind(this);
     }
 
     async ensureEverythingHooked() {
-        // monkey patch websockets to allow reuse
+        // Monkey patch websockets to allow reuse
         if (window.serialfruit.getTrackedSockets) {
             console.log('WebSocket tracking already enabled.');
             if (window.serialfruit.getTrackedSockets().length > 1) {
@@ -250,11 +240,11 @@ class SerialFruit {
                 console.log('Existing Closed WebSocket connections cleaned up.');
                 if (window.serialfruit.getTrackedSockets().filter(ws => ws.readyState === 1).length > 1) {
                     console.log('Unexpected MULTIPLE Open Existing WebSocket connections:', window.serialfruit.getTrackedSockets());
-                    for (const ws of window.serialfruit.getTrackedSockets().filter((x)=>x?.readyState===1)) {
+                    for (const ws of window.serialfruit.getTrackedSockets().filter(x => x?.readyState === 1)) {
                         console.log('Closing WebSocket:', ws);
                         ws.close();
                     }
-                    console.error('Existing WebSocket connections forceably closed.');
+                    console.error('Existing WebSocket connections forcibly closed.');
                 }
                 return;
             } else if (window.serialfruit.getTrackedSockets().length === 1) {
@@ -262,7 +252,6 @@ class SerialFruit {
             }
             return;
         } else {
-
             const originalWebSocket = window.WebSocket;
             const trackedSockets = [];
             
@@ -276,17 +265,74 @@ class SerialFruit {
             TrackingWebSocket.prototype = originalWebSocket.prototype;
             window.WebSocket = TrackingWebSocket;
             
-            window.serialfruit.getTrackedSockets = function () {
+            window.serialfruit.getTrackedSockets = function() {
                 return trackedSockets;
             };
-            window.serialfruit.cleanTrackedSockets = function () {
-                trackedSockets = trackedSockets.filter((x) => (x instanceof WebSocket && x?.readyState == 1) ||
-                    (x instanceof SerialPort && x?.readable && x?.writable) ||
-                    (x instanceof BluetoothDevice && x?.gatt?.connected));
+            window.serialfruit.cleanTrackedSockets = function() {
+                trackedSockets = trackedSockets.filter(x => 
+                    (x instanceof WebSocket && x.readyState === 1) ||
+                    (x instanceof SerialPort && x.readable && x.writable) ||
+                    (x instanceof BluetoothDevice && x.gatt.connected)
+                );
             };
             window.serialfruit._trackedSockets = trackedSockets;
             
             console.log('WebSocket tracking enabled.');
+        }
+    }
+
+    async connectAnySerial() {
+        if (this._writer) return;
+        if (this._webworkflow_serial || this._web_usb_serial) {
+            if (!window?.serialfruit?.getTrackedSockets) {
+                console.error('WebSocket/Serialport/BLE tracking not enabled, enabling now...');
+                await this.ensureEverythingHooked();
+            }
+            this._activeWebSocket = window.serialfruit.getTrackedSockets().find(ws => ws.readyState === 1);
+            if (this._activeWebSocket) {
+                this._writer = {
+                    write: async (data) => {
+                        console.debug('Attempting to send packet after fetching websocket:', data);
+                        if (!this._activeWebSocket || this._activeWebSocket.readyState !== 1) {
+                            console.error("WebSocket not found or not connected, attempting to reget.");
+                            this._activeWebSocket = window.serialfruit.getTrackedSockets().find(ws => ws.readyState === 1);
+                            if (!this._activeWebSocket) {
+                                console.debug('WebSocket refetch failed:', window.serialfruit.getTrackedSockets());
+                                debugger;
+                                console.error("WebSocket not found or not connected.");
+                                return;
+                            }
+                            console.log('WebSocket refetched:', this._activeWebSocket);
+                        }
+                        console.log('Sending packet:', data);
+                        this._activeWebSocket.send(new TextDecoder('ascii', { encoding: 'ascii' }).decode(Uint8Array.from(data)));
+                        console.log('Packet(s) sent:', data);
+                    }
+                };
+            } else {
+                console.error("WebSocket not found or not connected.");
+            }
+        } else if (this._ble_serial) {
+            console.error("BLE serial not supported yet");
+        } else {
+            if ('serial' in navigator) {
+                console.log("Attempting to connect to serial port...");
+                await this.connectSerial();
+            } else {
+                console.error("Web USB-serial not supported, try a Chromium based browser like Chrome or Edge.");
+            }
+        }
+    }
+
+    async connectSerial() {
+        try {
+            this._port = await navigator.serial.requestPort();
+            await this._port.open({ baudRate: 115200 });
+            this._writer = this._port.writable.getWriter();
+            this._trackedSockets.push(this._port);
+            console.log("Connected to serial port", this._port);
+        } catch (error) {
+            console.error("Failed to connect to serial port: ", error);
         }
     }
 
@@ -297,9 +343,10 @@ class SerialFruit {
             const stateElement = document.getElementById('web-serial-state');
             let returnedDeviceAndStates = [];
             if (!trackedSockets || trackedSockets.length === 0) {
-                returnedDeviceAndStates.push(['No tracked sockets', 'Disconnected'])
+                returnedDeviceAndStates.push(['No tracked sockets', 'Disconnected']);
             } else {
-                trackedSockets.forEach((ws) => {
+                trackedSockets.forEach(ws => {
+                    let deviceTextContents, stateTextContents;
                     if (ws instanceof WebSocket) {
                         deviceTextContents = ws.url;
                         switch (ws.readyState) {
@@ -340,56 +387,50 @@ class SerialFruit {
             }
             if (returnedDeviceAndStates.length !== 0) {
                 // Clear the table
-                const statsTableBody = await this.asyncAwaitVisibleElement('#statsTableBody',500);
+                const statsTableBody = await this.asyncAwaitVisibleElement('#statsTableBody', 500);
                 if (!statsTableBody) {
                     console.error('Stats table body not found');
                     return;
                 }
-                while (statsTableBody?.firstChild) {
+                while (statsTableBody.firstChild) {
                     statsTableBody.removeChild(statsTableBody.firstChild);
                 }
-
-                returnedDeviceAndStates.forEach((item) => {
+                returnedDeviceAndStates.forEach(item => {
                     const deviceTextContents = item[0];
                     const stateTextContents = item[1];
-                    // Create a new row for each device
                     const newRow = document.createElement('tr');
                     const deviceCell = document.createElement('td');
                     const stateCell = document.createElement('td');
-
                     deviceCell.textContent = deviceTextContents;
                     stateCell.textContent = stateTextContents;
-
                     newRow.appendChild(deviceCell);
                     newRow.appendChild(stateCell);
-
                     statsTableBody.appendChild(newRow);
                 });
             }
         }
     }
 
-    async asyncAwaitVisibleElement(selector, timeout=15000) {
+    async asyncAwaitVisibleElement(selector, timeout = 15000) {
         return new Promise((resolve, reject) => {
             let elements = document.querySelectorAll(selector);
-            elements = Array.from(elements).filter((x) => x.offsetHeight !== 0);
+            elements = Array.from(elements).filter(x => x.offsetHeight !== 0);
             if (elements.length > 0) {
                 resolve(elements[0]);
             } else {
                 const observer = new MutationObserver((mutationsList, observer) => {
                     elements = document.querySelectorAll(selector);
-                    elements = Array.from(elements).filter((x) => x.offsetHeight !== 0);
+                    elements = Array.from(elements).filter(x => x.offsetHeight !== 0);
                     if (elements.length > 0) {
                         observer.disconnect();
-                        clearTimeout(timeoutId); // Clear the timeout
+                        clearTimeout(timeoutId);
                         resolve(elements[0]);
                     }
                 });
                 observer.observe(document.body, { childList: true, subtree: true });
-
                 // Set a timeout to reject the promise if the element is not found within the specified time
                 const timeoutId = setTimeout(() => {
-                    observer.disconnect(); // Stop observing if timeout
+                    observer.disconnect();
                     console.error('Element not found within timeout:', selector);
                     resolve(null);
                 }, timeout);
@@ -399,50 +440,39 @@ class SerialFruit {
 
     async getVisibleElement(selector) {
         let buttons = [...document.querySelectorAll(selector)];
-        buttons = buttons.filter((x) => x.offsetHeight !== 0);
+        buttons = buttons.filter(x => x.offsetHeight !== 0);
         return Array.isArray(buttons) ? buttons[0] : buttons;
     }
 
-
-    // Ensure access to serial port and writer
     async ensureAddressAndSocketAccess() {
         if (window.location.host.match(/^((192.168)|(cpy-))/i)) {
             if (window.location.pathname.endsWith('cp/serial')) {
-                webworkflow_serial = true;
-                ensureEverythingHooked();
-                debugger;
+                this._webworkflow_serial = true;
+                await this.ensureEverythingHooked();
                 this._activeWebSocket = this._activeWebSocket || null;
                 this._activeWebSocket = this._activeWebSocket || new WebSocket('ws://' + window.location.host + '/ws/serial');
-                // console.log('Sending packet:', packet);
-                // activeWebSocket.send(packet.toArray());
-                // console.log('Packet sent:', packet.toArray());
                 return;
             } else if (window.location.pathname == "/code/") {
-                webworkflow_serial = true;
+                this._webworkflow_serial = true;
                 if (!window.serialfruit?.getTrackedSockets) {
-                    await ensureEverythingHooked();
-                
-                    // check if device connected state on page and reconnect
-                    let connectButton = await getVisibleElement('button.btn-connect');
+                    await this.ensureEverythingHooked();
+                    let connectButton = await this.getVisibleElement('button.btn-connect');
                     if (connectButton) {
                         if (connectButton.innerText === 'Disconnect') {
                             console.log('Device already connected, disconnecting first');
                             connectButton.click();
                             setTimeout(async () => {
                                 console.log('Reconnecting device');
-                                let cButton = await asyncAwaitVisibleElement('button.btn-connect', 5000);
+                                let cButton = await window.serialfruit.asyncAwaitVisibleElement('button.btn-connect', 5000);
                                 if (!cButton) {
                                     console.error('Visible "Connect" button not found');
                                     return;
                                 }
                                 cButton.click();
                                 setTimeout(async () => {
-                                    //button#web-workflow click
                                     console.log('Triggering button#web-workflow with event');
-                                    // first trigger focusIn on <div class="popup-modal shadow prompt closable is--visible" 
-                                    // and on button#web-workflow
-                                    let wModal = await asyncAwaitVisibleElement('div.popup-modal.is--visible[data-popup-modal="connection-type"]');
-                                    if (wModal){
+                                    let wModal = await window.serialfruit.asyncAwaitVisibleElement('div.popup-modal.is--visible[data-popup-modal="connection-type"]');
+                                    if (wModal) {
                                         let focusInEvent = new FocusEvent('focusin', {
                                             view: wModal.ownerDocument.defaultView,
                                             bubbles: true,
@@ -450,15 +480,14 @@ class SerialFruit {
                                         });
                                         wModal.dispatchEvent(focusInEvent);
                                         console.log('FocusIn event dispatched on modal');
-                                        let wButton = await asyncAwaitVisibleElement('button#web-workflow');
-                                        if (wButton){
+                                        let wButton = await window.serialfruit.asyncAwaitVisibleElement('button#web-workflow');
+                                        if (wButton) {
                                             let focusInEvent = new FocusEvent('focusin', {
                                                 view: wButton.ownerDocument.defaultView,
                                                 bubbles: true,
                                                 cancelable: false
                                             });
                                             wButton.dispatchEvent(focusInEvent);
-                                            // use PointerEvent with target instead of MouseEvent
                                             let clickEvent = new PointerEvent('click', {
                                                 view: wButton.ownerDocument.defaultView,
                                                 bubbles: true,
@@ -492,7 +521,6 @@ class SerialFruit {
                     } else {
                         console.error('Connect button not found');
                     }
-
                     // check if Serial panel (id serial-page) is visible or click button#btn-mode-serial
                     const serialPanel = document.getElementById('serial-page');
                     if (serialPanel) {
@@ -507,10 +535,7 @@ class SerialFruit {
                     } else {
                         console.error('Serial panel not found');
                     }
-
-                    // check if Serial panel is connected
                 }
-                // console.error('CircuitPython.org support not implemented yet - try using webserial.io or the device web workflow page (at device IP or circuitpython.local)');
             } else {
                 console.log("SerialFruit: Unsupported path:", window.location.pathname);
                 // fallback to doing connectSerial or BLE ourselves
@@ -521,8 +546,6 @@ class SerialFruit {
             // check if Serial panel is visible
 
             // check if Serial panel is connected
-
-            // send packet
             throw Error('Code.CircuitPython.Org support not implemented yet - try using webserial.io or the device web workflow page (at device IP or circuitpython.local)');
         } else if (window.location.host.match(/webserial.io/i)) {
             if (window.location.queryParams && !window.location.queryParams.vid) {
@@ -534,7 +557,7 @@ class SerialFruit {
             // check if device connected state on page
             if (document.querySelector('div#options').classList.contains('start')) {
                 console.log('Device not connected, connecting...');
-                ensureEverythingHooked();
+                await this.ensureEverythingHooked();
                 // document.querySelector('#options > fieldset > button').click();
             } else {
                 if (!window.serialfruit || !window.serialfruit._trackedSockets) {
@@ -543,44 +566,34 @@ class SerialFruit {
                     return;
                 }
             }
-            // check if Serial panel is connected
         } else {
             console.error('SerialFruit: Unsupported host:', window.location.host);
             // fallback to doing connectSerial or BLE ourselves
         }
     }
 
-
-    // Send packet via the serial connection
     async sendPacket(packet) {
-        ensureAddressAndSocketAccess();
-        if (!this._writer) await connectAnySerial();
+        await this.ensureAddressAndSocketAccess();
+        if (!this._writer) await this.connectAnySerial();
         try {
             // if already Uint8Array, just send it
             if (packet instanceof Uint8Array) {
                 await this._writer.write(packet);
                 console.log("Successfully sent packet:", packet);
-                return;
             } else if (packet instanceof BluefruitPacket) {
                 await this._writer.write(packet.toBytes());
                 console.log("Successfully sent packet:", packet.toBytes());
-                return;
             } else {
                 // assume it's a string
                 const packetArray = new TextEncoder().encode(packet);
                 await this._writer.write(packetArray);
                 console.log("Successfully sent packet:", packetArray);
-                return;
             }
-            // const packetArray = packet.toBytes();
-            // await writer.write(packetArray);
-            // console.log("Successfully sent packet:", packetArray);
         } catch (error) {
             console.error("Failed to send packet: ", error);
         }
     }
 
-    // Send color data
     async sendColor() {
         const color = document.getElementById("colorInput").value;
         const red = parseInt(color.slice(1, 3), 16);
@@ -592,12 +605,12 @@ class SerialFruit {
 
     async sendButton(button, pressed, eventType) {
         //todo: Add support for toggling button click type (mousedown, mouseup, versus click)
-        switch ((""+eventType).startsWith('on') ? eventType.slice(2) : eventType) {
+        switch (("" + eventType).startsWith('on') ? eventType.slice(2) : eventType) {
             case 'mousedown':
-                console.log('ignoring mousedown event for now...')
+                console.log('ignoring mousedown event for now...');
                 break;
             case 'mouseup':
-                console.log('ignoring mouseup event for now...')
+                console.log('ignoring mouseup event for now...');
                 break;
             case 'click':
             default:
@@ -607,17 +620,14 @@ class SerialFruit {
         }
     }
 
-    // Send control command
     async sendControlCommand(command) {
-        const controlCommandPacket = new ControlCommandPacket(command, 0x01); // Example value
+        const controlCommandPacket = new ControlCommandPacket(command, 0x01);
         await this.sendPacket(controlCommandPacket);
     }
 
-    // Send accelerometer data
     async sendAccelerometerData(event) {
-        window.serialfruit.lastAccelerometerEventTimestamp =
-            window.serialfruit.lastAccelerometerEventTimestamp || Date.now();
-        if (Date.now() - window.serialfruit.lastAccelerometerEventTimestamp < 500) {
+        this.lastAccelerometerEventTimestamp = this.lastAccelerometerEventTimestamp || Date.now();
+        if (Date.now() - this.lastAccelerometerEventTimestamp < 500) {
             const x = event.accelerationIncludingGravity.x || 0;
             const y = event.accelerationIncludingGravity.y || 0;
             const z = event.accelerationIncludingGravity.z || 0;
@@ -636,15 +646,14 @@ class SerialFruit {
         }
     }
 
-    // Toggle accelerometer data capture
     async toggleAccelerometer(deviceOrBrowser = 'browser') {
         if (deviceOrBrowser === 'device') {
             if (window.DeviceMotionEvent) {
-                if (accelerometerEnabled) {
-                    window.removeEventListener('devicemotion', sendAccelerometerData);
+                if (this._accelerometerEnabled) {
+                    window.removeEventListener('devicemotion', this.sendAccelerometerData.bind(this));
                     console.log('Device motion event listener removed');
                 } else {
-                    window.addEventListener('devicemotion', sendAccelerometerData);
+                    window.addEventListener('devicemotion', this.sendAccelerometerData.bind(this));
                     console.log('Device motion event listener added');
                 }
                 this._accelerometerEnabled = !this._accelerometerEnabled;
@@ -652,26 +661,22 @@ class SerialFruit {
                 console.error('Device motion not supported on this device');
                 alert('Device motion not supported on this device, possibly try messing with the browser settings');
             }
-            return;
         } else if (deviceOrBrowser === 'browser') {
             // TODO: set up subscription to incoming messages, route to accelerometer visualisation or appropriate bridging transport (BLE/web-serial/WifiWebWorkflow/AdafruitIO-MQTT/AdafruitIO-REST)
             console.log('Toggling browser accelerometer data capture');
         }
     }
 
-    // Send AT command
     async sendATCommand() {
         const command = document.getElementById("commandInput").value;
         const atCommandPacket = new ATCommandPacket(command);
         await this.sendPacket(atCommandPacket);
     }
 
-    // Send DFU packet
     async sendDFUPacket() {
         const fileInput = document.getElementById("dfuFileInput");
         const file = fileInput.files[0];
         const reader = new FileReader();
-        const self=this;
         reader.onload = function(e) {
             const arrayBuffer = e.target.result;
             const dfuPacket = new DFUPacket(new Uint8Array(arrayBuffer));
@@ -680,7 +685,6 @@ class SerialFruit {
         reader.readAsArrayBuffer(file);
     }
 
-    // Send Security packet
     async sendSecurityPacket() {
         const securityData = document.getElementById("securityInput").value;
         const payload = Array.from(new TextEncoder().encode(securityData));
@@ -688,7 +692,6 @@ class SerialFruit {
         await this.sendPacket(securityPacket);
     }
 
-    // Send Read packet
     async sendReadPacket() {
         const readData = document.getElementById("readInput").value;
         const payload = Array.from(new TextEncoder().encode(readData));
@@ -696,7 +699,6 @@ class SerialFruit {
         await this.sendPacket(readPacket);
     }
 
-    // Send Write packet
     async sendWritePacket() {
         const writeData = document.getElementById("writeInput").value;
         const payload = Array.from(new TextEncoder().encode(writeData));
@@ -704,7 +706,6 @@ class SerialFruit {
         await this.sendPacket(writePacket);
     }
 
-    // Send Notify packet
     async sendNotifyPacket() {
         const notifyData = document.getElementById("notifyInput").value;
         const payload = Array.from(new TextEncoder().encode(notifyData));
@@ -712,13 +713,11 @@ class SerialFruit {
         await this.sendPacket(notifyPacket);
     }
 
-    // Send Scan packet
     async sendScanPacket() {
         const scanPacket = new ScanPacket(new Uint8Array([]));
         await this.sendPacket(scanPacket);
     }
 
-    // Send IO Pin packet
     async sendIOPinPacket() {
         const ioPinData = document.getElementById("ioPinInput").value;
         const payload = Array.from(new TextEncoder().encode(ioPinData));
@@ -726,7 +725,6 @@ class SerialFruit {
         await this.sendPacket(ioPinPacket);
     }
 
-    // Send Neopixel packet
     async sendNeopixelPacket() {
         const neopixelData = document.getElementById("neopixelInput").value;
         const payload = Array.from(new TextEncoder().encode(neopixelData));
@@ -734,14 +732,12 @@ class SerialFruit {
         await this.sendPacket(neopixelPacket);
     }
 
-    // Send String packet
     async sendStringPacket() {
         const stringData = document.getElementById("stringInput").value;
         const stringPacket = new StringPacket(stringData);
         await this.sendPacket(stringPacket);
     }
 
-    // Send Raw Bytes packet
     async sendRawBytes() {
         const rawBytesInput = document.getElementById("rawBytesInput").value;
         const rawBytes = rawBytesInput.split(',').map(byte => parseInt(byte.trim(), 10));
@@ -749,14 +745,12 @@ class SerialFruit {
         await this.sendPacket(rawPacket);
     }
 
-    // Send Raw String packet
     async sendRawString() {
         const rawStringInput = document.getElementById("rawStringInput").value;
         const stringPacket = new StringPacket(rawStringInput);
         await this.sendPacket(stringPacket);
     }
 
-    // Send location
     async sendLocation() {
         const latitude = parseFloat(document.getElementById("latitudeInput").value);
         const longitude = parseFloat(document.getElementById("longitudeInput").value);
@@ -764,22 +758,18 @@ class SerialFruit {
         await this.sendPacket(locationPacket);
     }
 
-    // Use current location
     async getCurrentLocation() {
         navigator.geolocation.getCurrentPosition((position) => {
             const latitude = position.coords.latitude;
             const longitude = position.coords.longitude;
             document.getElementById("latitudeInput").value = latitude;
             document.getElementById("longitudeInput").value = longitude;
-            sendLocation();
+            this.sendLocation();
         });
     }
 }
 
-
 window.serialfruit = window.serialfruit || new SerialFruit();
 window.serialfruit.showScreen = showScreen;
-// window.serialfruit.ensureAddressAndSocketAccess = ensureAddressAndSocketAccess;
-window.serialfruit._trackedSockets = [];
 
-setInterval(async ()=> await window.serialfruit.updateStatsTable(), 5000);
+setInterval(async () => await window.serialfruit.updateStatsTable(), 5000);

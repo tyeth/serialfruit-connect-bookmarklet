@@ -36,6 +36,7 @@
     margin-bottom: 3px;
     background-color: initial !important;
     color: initial !important;
+    width: auto;
 }
 
 #serialfruit-body dt *, #serialfruit-body dd * {

@@ -228,59 +228,92 @@ class SerialFruit {
 
         port.open = async function() {
             await originalOpen.apply(port, arguments);
-            if (!self._writer) {
-                self._writer = self.createWritableProxy(port.writable);
-            }
-            if (!self._reader) {
-                self._reader = self.createReadableProxy(port.readable);
-            }
             self._trackedSockets.push(port);
-            console.log("Serial port opened and writer/reader tracked:", port);
+            console.log("Serial port opened and tracked:", port);
 
             const originalGetWriter = port.writable.getWriter.bind(port.writable);
             port.writable.getWriter = function() {
-                return self._writer || (self._writer = originalGetWriter());
+                if (!self._writer) {
+                    self._writer = self.createWritableProxy(port.writable);
+                }
+                return self._writer;
             };
-            // port.writable.pipeTo = self._writer.pipeTo.bind(self._writer);
-            // port.writable.pipeThrough = self._writer.pipeThrough.bind(self._writer);
 
+            port.writable.write = function(data) {
+                if (!self._writer) {
+                    self._writer = self.createWritableProxy(port.writable);
+                }
+                return WritableStreamDefaultWriter.prototype.write.bind(self._writer, data);
+            };
+
+            port.writable.releaseLock = function() {
+                if (!self._writer) {
+                    self._writer = self.createWritableProxy(port.writable);
+                }
+                return WritableStreamDefaultWriter.prototype.releaseLock.bind(self._writer);
+            };
+
+            // port.writable.
 
             const originalGetReader = port.readable.getReader.bind(port.readable);
             port.readable.getReader = function() {
-                return self._reader || (self._reader = originalGetReader());
+                if (!self._reader) {
+                    self._reader = self.createReadableProxy(port.readable);
+                }
+                return self._reader;
             };
-            port.readable.pipeTo = ReadableStream.prototype.pipeTo.bind(port.readable);
-            port.readable.pipeThrough = ReadableStream.prototype.pipeThrough.bind(port.readable);
 
+            // Proxy pipeTo and pipeThrough methods
+            port.readable.pipeTo = function(dest, options) {
+                if (!self._reader) {
+                    self._reader = self.createReadableProxy(port.readable);
+                }
+                return ReadableStream.prototype.pipeTo.call(port.readable, dest, options);
+            };
+
+            port.readable.pipeThrough = function(transform, options) {
+                if (!self._reader) {
+                    self._reader = self.createReadableProxy(port.readable);
+                }
+                return ReadableStream.prototype.pipeThrough.call(port.readable, transform, options);
+            };
         }.bind(this);
     }
 
     createWritableProxy(writable) {
-        const writer = writable.getWriter();
-        return writer;
-        // {
-        //     write: (data) => writer.write(data),
-        //     close: () => writer.close(),
-        //     abort: (reason) => writer.abort(reason),
-        //     releaseLock: () => writer.releaseLock(),
-        //     locked: writer.locked,
-        //     desiredSize: writer.desiredSize,
-        //     pipeTo: writer.pipeTo.bind(writer),
-        //     pipeThrough: writer.pipeThrough.bind(writer)
-        // };
+        return new Proxy(writable, {
+            get(target, prop) {
+                if (prop === 'getWriter') {
+                    return function() {
+                        return target.getWriter();
+                    };
+                }
+                return target[prop];
+            }
+        });
     }
 
     createReadableProxy(readable) {
-        const reader = readable.getReader();
-        return {
-            read: () => reader.read(),
-            releaseLock: () => reader.releaseLock(),
-            cancel: (reason) => reader.cancel(reason),
-            closed: reader.closed,
-            pipeTo: reader.pipeTo ? reader.pipeTo.bind(reader) : undefined,
-            pipeThrough: reader.pipeThrough ? reader.pipeThrough.bind(reader) : undefined,
-            locked: reader.locked
-        };
+        return new Proxy(readable, {
+            get(target, prop) {
+                if (prop === 'getReader') {
+                    return function() {
+                        return target.getReader();
+                    };
+                }
+                if (prop === 'pipeTo') {
+                    return function(dest, options) {
+                        return ReadableStream.prototype.pipeTo.call(target, dest, options);
+                    };
+                }
+                if (prop === 'pipeThrough') {
+                    return function(transform, options) {
+                        return ReadableStream.prototype.pipeThrough.call(target, transform, options);
+                    };
+                }
+                return target[prop];
+            }
+        });
     }
 
     async ensureEverythingHooked() {

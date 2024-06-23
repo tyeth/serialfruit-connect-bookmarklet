@@ -77,7 +77,8 @@
     <div id="color-picker" class="screen">
         <h1>Color Picker</h1>
         <button onclick="window.serialfruit.showScreen('main-menu')">Back to menu</button><hr />
-        <input type="color" id="colorInput">
+        <label for="colorInput">Choose a color:</label>
+        <input type="color" id="colorInput" title="Color selection">
         <button onclick="window.serialfruit.sendColor()">Send Color</button>
     </div>
 
@@ -132,7 +133,7 @@
     <div id="dfu" class="screen">
         <h1>DFU</h1>
         <button onclick="window.serialfruit.showScreen('main-menu')">Back to menu</button><hr />
-        <input type="file" id="dfuFileInput">
+        <input type="file" id="dfuFileInput" title="Choose a file" placeholder="Select a file">
         <button onclick="window.serialfruit.sendDFUPacket()">Send DFU Packet</button>
     </div>
 
@@ -187,7 +188,139 @@
         <!-- also support json export + draggable pixels / drawable polyline  -->
         <input type="text" id="neopixelInput" placeholder="Enter Neopixel data">
         <button onclick="window.serialfruit.sendNeopixelPacket()">Send Neopixel Packet</button>
+        <hr />
+        <button onclick="window.serialfruit.showScreen('neopixel-matrix')">Neopixel Matrix</button>
+        <button onclick="window.serialfruit.showScreen('neopixel-strand')">Neopixel Strand</button>
+        <button onclick="window.serialfruit.showScreen('neopixel-shape')">Neopixel Custom Shape</button>
     </div>
+
+    <!-- Neopixel Matrix Screen -->
+    <div id="neopixel-matrix" class="screen">
+        <h1>Neopixel Matrix</h1>
+        <button onclick="window.serialfruit.showScreen('main-menu')">Back to menu</button>
+        <button onclick="window.serialfruit.showScreen('neopixel')">Back to Neopixel page</button>
+        <hr />
+        <!-- TODO: load and save alternative matrix configurations and canvas images to push from localStorage and user files -->
+        <input type="text" id="neopixelMatrixInput" placeholder="Enter Neopixel Matrix Configuration data">
+        <!-- instruct user on data format in tooltip to represent the matrix options for setup - we'll do colour and brightness later, json-like -->
+        <label for="neopixelMatrixInput" title="Enter Neopixel Matrix data in JSON format - adafruit neopixel matrix library compatible">Enter Neopixel Matrix data in JSON format*</label>
+        <hr />
+        <!-- panel for drawing on users matrix, save current config to browser storage if user changes setup - before auto-regen! -->
+        <label for="neopixelMatrixCanvas">Draw on your Neopixel Matrix</label>
+        <canvas id="neopixelMatrixCanvas" width="250" height="250"></canvas>
+        <!-- drawing pen tools: -->
+        <label for="neopixelMatrixPenSize">Choose a pen size:</label>
+        <input type="range" id="neopixelMatrixPenSize" title="Pen size selection" min="1" max="16" step="1" value="1">
+        <label for="neopixelMatrixColor">Choose a color:</label>
+        <input type="color" id="neopixelMatrixColor" title="Color selection">
+        <label for="neopixelMatrixBrightness">Choose a brightness:</label>
+        <input type="range" id="neopixelMatrixBrightness" title="Brightness selection" min="0" max="255" step="1" value="255">
+        <hr />
+        <button onclick="window.serialfruit.clearNeopixelMatrixCanvas()">Clear All to black</button>
+        <button onclick="window.serialfruit.fillNeopixelMatrixCanvas()">Fill All with current color</button>
+        <button onclick="window.serialfruit.sendNeopixelMatrixCanvas()">Send Matrix Canvas</button>
+        <hr />
+
+        <button onclick="window.serialfruit.sendNeopixelMatrixPacket()">Send Neopixel Matrix Packet</button>
+    </div>
+
+    <!-- Neopixel Strand Screen -->
+    <div id="neopixel-strand" class="screen">
+        <h1>Neopixel Strand</h1>
+        <button onclick="window.serialfruit.showScreen('main-menu')">Back to menu</button>
+        <button onclick="window.serialfruit.showScreen('neopixel')">Back to Neopixel page</button>
+        <hr />
+        <labl for="neopixelStrandSize">Choose a strand size:</label>
+        <input type="range" id="neopixelStrandSize" title="Strand size selection" min="1" max="65535" step="1">
+        <hr />
+        <input type="text" id="neopixelStrandInput" placeholder="Enter Neopixel Strand Configuration data">
+        <!-- instruct user on data format in tooltip to represent the strand options for setup - we'll do colour and brightness later, json-like -->
+        <label for="neopixelStrandInput" title="Enter Neopixel Strand data in JSON format - adafruit neopixel strand library compatible">Enter Neopixel Strand data in JSON format*</label>
+        <hr />
+        <!-- panel for drawing on users strand, save current config to browser storage if user changes setup - before auto-regen! -->
+        <label for="neopixelStrandCanvas">Draw on your Neopixel Strand</label>
+        <canvas id="neopixelStrandCanvas" width="250" height="50"></canvas>
+        <!-- drawing tools: -->
+         <!--pen-->
+        <label for="neopixelStrandTool">Choose a pen:</label>
+        <input type="radio" id="neopixelStrandTool" name="neopixelStrandTool" value="pen"><label for="neopixelStrandTool">Pen</label>
+        <label for="neopixelStrandPenSize">Choose a pen size:</label>
+        <input type="range" id="neopixelStrandPenSize" title="Pen size selection" min="1" max="16" step="1" value="1">
+        <!--shapes-->
+        <label for="neopixelStrandTool">Choose a shape:</label>
+        <input type="radio" id="neopixelStrandTool" name="neopixelStrandTool" value="line"><label for="neopixelStrandTool">PolyLine</label>
+        <input type="radio" id="neopixelStrandTool" name="neopixelStrandTool" value="circle"><label for="neopixelStrandTool">Circle</label>
+        <input type="radio" id="neopixelStrandTool" name="neopixelStrandTool" value="rectangle"><label for="neopixelStrandTool">Rectangle</label>
+        <input type="radio" id="neopixelStrandTool" name="neopixelStrandTool" value="triangle"><label for="neopixelStrandTool">Triangle</label>
+        <input type="radio" id="neopixelStrandTool" name="neopixelStrandTool" value="polygon"><label for="neopixelStrandTool">Polygon*</label>
+        <input type="radio" id="neopixelStrandTool" name="neopixelStrandTool" value="star"><label for="neopixelStrandTool">Star*</label>
+        <input type="radio" id="neopixelStrandTool" name="neopixelStrandTool" value="text"><label for="neopixelStrandTool">Text</label>
+        <!--drawing options for the shape tools -->
+        <label for="neopixelStrandShapeSize">Choose a fixed shape size:</label>
+        <input type="checkbox" id="neopixelStrandShapeSize" title="Fixed shape size selection">
+        <input type="range" id="neopixelStrandShapeWidth" title="Shape height/width selection" min="1" step="0.5" value="1">
+        <label >Number of Polygon sides *(optional):</label>
+        <input type="number" id="neopixelStrandShapeSides" title="Number of sides selection" min="3" max="16" step="1" value="3">
+        <label >Number of Star points *(optional):</label>
+        <input type="number" id="neopixelStrandShapePoints" title="Number of points selection" min="3" max="16" step="1" value="3">
+        <hr />
+        <label for="neopixelStrandColor">Choose a color:</label>
+        <input type="color" id="neopixelStrandColor" title="Color selection">
+        <label for="neopixelStrandBrightness">Choose a brightness:</label>
+        <input type="range" id="neopixelStrandBrightness" title="Brightness selection" min="0" max="255" step="1" value="255">
+        <hr />
+        <button onclick="window.serialfruit.clearNeopixelStrandCanvas()">Clear All to black</button>
+        <button onclick="window.serialfruit.fillNeopixelStrandCanvas()">Fill All with current color</button>
+        <button onclick="window.serialfruit.sendNeopixelStrandCanvas()">Send Strand Canvas</button>
+        <hr />
+
+        <button onclick="window.serialfruit.sendNeopixelStrandPacket()">Send Neopixel Strand Packet</button>
+    </div>
+
+    <!-- Neopixel Custom Shape Screen -->
+    <div id="neopixel-shape" class="screen">
+        <h1>Neopixel Custom Shape</h1>
+        <button onclick="window.serialfruit.showScreen('main-menu')">Back to menu</button>
+        <button onclick="window.serialfruit.showScreen('neopixel')">Back to Neopixel page</button>
+        <hr />
+        <input type="text" id="neopixelShapeInput" placeholder="Enter Neopixel Shape Configuration data">
+        <!-- instruct user on data format in tooltip to represent the shape options for setup - we'll do colour and brightness later, json-like -->
+        <label for="neopixelShapeInput" title="Enter Neopixel Shape data in JSON format - adafruit neopixel shape library compatible">Enter Neopixel Shape data in JSON format*</label>
+        <hr />
+        <!-- panel for drawing on users shape, save current config to browser storage if user changes setup - before auto-regen! -->
+        <label for="neopixelShapeCanvas">Draw your Neopixel Shape</label>
+        <canvas id="neopixelShapeCanvas" width="250" height="250"></canvas>
+        <!-- drawing pen tools - matrix (+specify type?) or strand (pixel is strand size 1) -->
+        <label for="neopixelShapeStrand">Create a Neopixel Strand (polyline) of pixel length:</label>
+        <input type="range" id="neopixelShapeStrand" title="Strand size selection" min="1" max="65535" step="1">
+        <button onclick="window.serialfruit.createNeopixelStrand()">set drawing tool to Create Strand</button>
+        <label for="neopixelShapeMatrix">Create a Neopixel Matrix (polyline) of pixel size:</label>
+        <input type="range" id="neopixelShapeMatrixWidth" title="Matrix width selection" min="1" max="65535" step="1">
+        <input type="range" id="neopixelShapeMatrixHeight" title="Matrix height selection" min="1" max="65535" step="1">
+        <input type="radio" id="neopixelShapeMatrixType" name="neopixelShapeMatrixType" value="hub75"><label for="neopixelShapeMatrixType">Hub75</label>
+        <input type="radio" id="neopixelShapeMatrixType" name="neopixelShapeMatrixType" value="adafruit"><label for="neopixelShapeMatrixType">Adafruit/Normal</label>
+        <input type="radio" id="neopixelShapeMatrixType" name="neopixelShapeMatrixType" value="other"><label for="neopixelShapeMatrixType">Custom</label>
+        <button onclick="window.serialfruit.createNeopixelMatrix()">set drawing tool to Create Matrix</button>
+        <hr />
+        <label for="neopixelDrawCanvas">Draw your Neopixel Colours and brightnesses and sequences</label>
+        <canvas id="neopixelDrawCanvas" width="250" height="250"></canvas>
+        <!-- drawing pen tools: -->
+        <label for="neopixelShapePenSize">Choose a pen size:</label>
+        <input type="range" id="neopixelShapePenSize" title="Pen size selection" min="1" max="16" step="1" value="1">
+        <label for="neopixelShapeColor">Choose a color:</label>
+        <input type="color" id="neopixelShapeColor" title="Color selection">
+        <label for="neopixelShapeBrightness">Choose a brightness:</label>
+        <input type="range" id="neopixelShapeBrightness" title="Brightness selection" min="0" max="255" step="1" value="255">
+        <hr />
+        <button onclick="window.serialfruit.clearNeopixelShapeCanvas()">Clear All to black</button>
+        <button onclick="window.serialfruit.fillNeopixelShapeCanvas()">Fill All with current color</button>
+        <button onclick="window.serialfruit.sendNeopixelShapeCanvas()">Send Shape Canvas</button>
+        <hr />
+        <!-- TODO: Sequences - a bit like a simple pixel based midi seqeuncer with load and save options, cycle etc -->
+
+        <button onclick="window.serialfruit.sendNeopixelShapePacket()">Send Neopixel Shape Packet</button>
+    </div>
+
 
     <!-- String Screen -->
     <div id="string" class="screen">

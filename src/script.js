@@ -897,11 +897,13 @@ class SerialFruit {
 window.serialfruit = window.serialfruit || new SerialFruit();
 window.serialfruit.showScreen = showScreen;
 setTimeout(async () => {
-    Promise.resolve(await window.serialfruit.asyncAwaitVisibleElement(
-        // toggle panel button
-        'button#serialfruit-toggle',
-        3500
-    )).then(async ()=> {
+    var p = new Promise(async function(resolve, reject) {
+        if(await window.serialfruit.asyncAwaitVisibleElement('button#serialfruit-toggle', 3500)) {
+            resolve('foo');
+        } else {
+            reject('bar');
+        }
+    }).then(async ()=> {
         await window.serialfruit.showScreen('main-menu');
         setTimeout(async () => {
             await window.serialfruit.ensureAddressAndSocketAccess();

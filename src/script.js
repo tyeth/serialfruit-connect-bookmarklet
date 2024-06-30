@@ -898,10 +898,11 @@ window.serialfruit = window.serialfruit || new SerialFruit();
 window.serialfruit.showScreen = showScreen;
 setTimeout(async () => {
     var p = new Promise(async function(resolve, reject) {
-        if(await window.serialfruit.asyncAwaitVisibleElement('button#serialfruit-toggle', 3500)) {
-            resolve('foo');
+        let b = await window.serialfruit.asyncAwaitVisibleElement('button#serialfruit-toggle', 3500);
+        if(b) {
+            resolve(b);
         } else {
-            reject('bar');
+            reject('not found');
         }
     }).then(async ()=> {
         await window.serialfruit.showScreen('main-menu');

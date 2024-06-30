@@ -11,12 +11,16 @@
     var style = document.createElement("style");
     style.textContent = "@import url('https://cdn.jsdelivr.net/gh/tyeth/serialfruit-connect@v0.0.99/src/style.css');";
     style.setAttributeNode(document.createAttribute("scoped"));
+    let crs = document.createAttribute("crossorigin");
+    crs.value = "anonymous";
+    style.setAttributeNode(crs);
+    // style.src = "https://cdn.jsdelivr.net/gh/tyeth/serialfruit-connect@v0.0.97/src/style.css";
     container.appendChild(style);
     console.log('CSS loaded');
 
     // Create a script element for the JavaScript
     var script = document.createElement("script");
-    script.src = "https://cdn.jsdelivr.net/gh/tyeth/serialfruit-connect@v0.0.99/src/script.js";
+    script.crossOrigin = "anonymous";
     script.onload = function() {
         console.log('Script loaded');
         
@@ -66,5 +70,6 @@
         debugger;
         console.error('Failed to load the script', error);
     };
+    script.src = "https://cdn.jsdelivr.net/gh/tyeth/serialfruit-connect@v0.0.99/src/script.js";
     document.body.appendChild(script);
 })();

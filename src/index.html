@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bluefruit Web Serial</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/tyeth/serialfruit-connect@v0.0.99/src/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/tyeth/serialfruit-connect@v0.0.99/src/style.css" crossorigin="anonymous">
 </head>
 <body class="serialfruit-body">
     <div id="main-menu" class="screen">
@@ -53,7 +53,7 @@
             </div>
         </div>
         <div class="buttons">
-
+            <button onclick="window.serialfruit.showScreen('servo-control')">Servo Control</button>
             <button onclick="window.serialfruit.showScreen('color-picker')">Color Picker</button>
             <button onclick="window.serialfruit.showScreen('control-pad')">Control Pad</button>
             <button onclick="window.serialfruit.showScreen('accelerometer')">Accelerometer</button>
@@ -73,6 +73,25 @@
         </div>
     </div>
     
+    <!-- Servo Control Screen -->
+    <div id="servo-control" class="screen">
+        <h1>Servo Control</h1>
+        <button onclick="showScreen('main-menu')">Back to menu</button><hr />
+        <div>
+            <label for="pan-slider">Pan:</label>
+            <input type="range" id="pan-slider" min="0" max="180" value="90" oninput="updateServoControl()">
+        </div>
+        <div>
+            <label for="tilt-slider">Tilt:</label>
+            <input type="range" id="tilt-slider" min="0" max="180" value="90" oninput="updateServoControl()">
+        </div>
+        <div>
+            <label for="roll-slider">Roll:</label>
+            <input type="range" id="roll-slider" min="0" max="180" value="90" oninput="updateServoControl()">
+        </div>
+        <button onclick="centerServos()">Center Servos</button>
+    </div>
+
     <!-- Color Picker Screen -->
     <div id="color-picker" class="screen">
         <h1>Color Picker</h1>

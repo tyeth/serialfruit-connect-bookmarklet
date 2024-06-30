@@ -20,10 +20,15 @@ import time
 # sys.exit(0)
 # from board_definitions import adafruit_matrixportal_s3 as board
 import board
+import io
 
 import digitalio
 
 from adafruit_crickit import crickit
+servo1_pulses = (500, 2500)  # min and max pulse lengths for servo 1
+servo2_pulses = (500, 2500)
+servo3_pulses = (500, 2500)
+
 
 def logError(error):
     print("=-> ** Error: ", end="")
@@ -41,9 +46,11 @@ except ImportError as ie:
 
 # Import the packet classes that will be used.
 from adafruit_bluefruit_connect.packet import Packet
+# from adafruit_bluefruit_connect.raw_text_packet import Packet
 # Only the packet classes that are imported will be known to Packet.
 from adafruit_bluefruit_connect.button_packet import ButtonPacket
 from adafruit_bluefruit_connect.color_packet import ColorPacket
+from adafruit_bluefruit_connect.raw_text_packet import RawTextPacket
 
 fake_blue=False
 
@@ -111,6 +118,19 @@ motor_2 = crickit.dc_motor_2
 FWD = -1.0
 REV = 0.7
 
+# servos
+servo1 = crickit.servo_1
+servo2 = crickit.servo_2
+servo3 = crickit.servo_3
+servo1.set_pulse_width_range(servo1_pulses[0], servo1_pulses[1])
+servo2.set_pulse_width_range(servo2_pulses[0], servo2_pulses[1])
+servo3.set_pulse_width_range(servo3_pulses[0], servo3_pulses[1])
+servo1.angle = 90
+servo2.angle = 90
+servo3.angle = 90
+
+
+# neopixel setup
 crickit.init_neopixel(24, brightness = 0.2)  # create Crickit neopixel object
 RED = (200, 0, 0)
 GREEN = (0, 200, 0)
@@ -182,11 +202,20 @@ def get_serial_data(should_convert_slash_x_strings=False):
 
     # Use the converted bytes for packet creation or processing
     try:
+        # make serial_bytes into a readable RawIO like stream
+        raw_stream = io.BytesIO(serial_bytes)  # TODO: refactor this stream stuff
+        decoded_packet = Packet.from_stream(raw_stream)  # Make sure packet expects bytes
+        print("Decoded Packet: ", decoded_packet)
+        return decoded_packet
+    except ValueError as ve:
+        print("Error: ", ve)
+        print("Raw Text Packet decoding failed: is None")
+    try:
         decoded_packet = Packet.from_bytes(serial_bytes)  # Make sure packet expects bytes
         print("Decoded Packet: ", decoded_packet)
         return decoded_packet
-    except ValueError as e:
-        print("Error: ", e)
+    except ValueError as ve:
+        print("Error: ", ve)
         print("Packet decoding failed: is None")
     return None
 
@@ -263,9 +292,30 @@ while True:
                 print("Color Packet: ", PACKET.color)
                 color = PACKET.color
                 crickit.neopixel.fill(color)
+            
+
+            # servos
+            if isinstance(PACKET, RawTextPacket):
+                print("Raw Text Packet: ", PACKET.text)
+                # assume it's pan,tilt,roll servo angles 0-180
+                try:
+                    # comes as a byte string, with RT prefix
+                    pan, tilt, roll = PACKET.text.decode()[2:].split(",")
+                    print("Pan/Tilt/Roll: ", pan, tilt, roll)
+                    pan = int(pan)
+                    tilt = int(tilt)
+                    roll = int(roll)
+                    print("Setting Servo1-3 Pan/Tilt/Roll: ", pan, tilt, roll, end=" ")
+                    crickit.servo_1.angle = pan
+                    crickit.servo_2.angle = tilt
+                    crickit.servo_3.angle = roll
+                    print("Servo1-3 Pan/Tilt/Roll set")
+                except Exception as e:
+                    print("Error decoding raw packet to Pan/Tilt/Roll: ", e)
+
 
             # do this when buttons are pressed
-            if isinstance(PACKET, ButtonPacket) and PACKET.pressed:
+            elif isinstance(PACKET, ButtonPacket) and PACKET.pressed:
                 red_led.value = True  # blink to show a packet has been received
                 if PACKET.button == ButtonPacket.UP:  # UP button pressed
                     crickit.neopixel.fill(color)

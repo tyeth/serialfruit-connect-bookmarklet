@@ -1,0 +1,10 @@
+{
+    "python.envFile": "${workspaceFolder}/.venv",
+    "python.analysis.extraPaths": [
+        "${workspaceFolder}",
+        "${workspaceFolder}/lib",
+        "D:/lib",
+        "E:/lib",
+        "${workspaceFolder}/.venv/Lib/site-packages",
+    ],
+}

@@ -128,10 +128,10 @@ class QuaternionPacket extends BluefruitPacket {
     }
 }
 
-class RawTextPacket extends BluefruitPacket {
+class RawTextPacket {
     constructor(text) {
-        const payload = new TextEncoder().encode(text);
-        super('!T', payload);
+        const payload = new TextEncoder().encode("RT" + text + '\n');
+        return payload;
     }
 }
 
@@ -633,7 +633,8 @@ class SerialFruit {
             // check if Serial panel is visible
 
             // check if Serial panel is connected
-            throw Error('Code.CircuitPython.Org support not implemented yet - try using webserial.io or the device web workflow page (at device IP or circuitpython.local)');
+            console.warn('Code.CircuitPython.Org support not implemented yet - try using webserial.io or the device web workflow page (at device IP or circuitpython.local)');
+        ensureEverythingHooked();
         } else if (window.location.host.match(/webserial.io/i)) {
             if (window.location.queryParams && !window.location.queryParams.vid) {
                 console.error('WebSerial.io: No vid query parameter found - visit page first with a device selected');
@@ -728,6 +729,21 @@ class SerialFruit {
                 break;
         }
     }
+
+function updateServoControl() {
+    const pan = document.getElementById('pan-slider').value;
+    const tilt = document.getElementById('tilt-slider').value;
+    const roll = document.getElementById('roll-slider').value;
+    const packet = new RawTextPacket(`${pan},${tilt},${roll}`);
+    sendPacket(packet);
+}
+
+function centerServos() {
+    document.getElementById('pan-slider').value = 90;
+    document.getElementById('tilt-slider').value = 90;
+    document.getElementById('roll-slider').value = 90;
+    updateServoControl();
+}
 
     async sendControlCommand(command) {
         const controlCommandPacket = new ControlCommandPacket(command, 0x01);

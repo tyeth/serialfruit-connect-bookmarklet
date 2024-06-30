@@ -44,6 +44,7 @@
 
         // Add a toggle button to the document body
         var toggleButton = document.createElement("button");
+        toggleButton.id = "serialfruit-toggle";
         toggleButton.innerText = "Toggle Panel";
         toggleButton.style.cssText = "position:fixed;top:10px;right:10px;width:100px;height:auto;z-index:10001;";
         toggleButton.onclick = function() {

@@ -9,7 +9,7 @@
 
     // Create a style element for CSS
     var style = document.createElement("style");
-    style.textContent = "@import url('https://cdn.jsdelivr.net/gh/tyeth/serialfruit-connect@v0.0.106/src/style.css');";
+    style.textContent = "@import url('https://cdn.jsdelivr.net/gh/tyeth/serialfruit-connect@v0.0.108/src/style.css');";
     style.setAttributeNode(document.createAttribute("scoped"));
     let crs = document.createAttribute("crossorigin");
     crs.value = "anonymous";
@@ -32,7 +32,7 @@
         console.log('Panel created');
         
         // Add the content from your index.html to the panel
-        fetch("https://cdn.jsdelivr.net/gh/tyeth/serialfruit-connect@v0.0.106/src/index.html")
+        fetch("https://cdn.jsdelivr.net/gh/tyeth/serialfruit-connect@v0.0.108/src/index.html")
             .then(response => response.text())
             .then(html => {
                 panel.innerHTML = html + panel.innerHTML;
@@ -65,6 +65,6 @@
         debugger;
         console.error('Failed to load the script', error);
     };
-    script.src = "https://cdn.jsdelivr.net/gh/tyeth/serialfruit-connect@v0.0.106/src/script.js";
+    script.src = "https://cdn.jsdelivr.net/gh/tyeth/serialfruit-connect@v0.0.108/src/script.js";
     document.body.appendChild(script);
 })();

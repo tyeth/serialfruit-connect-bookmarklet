@@ -730,20 +730,20 @@ class SerialFruit {
         }
     }
 
-function updateServoControl() {
-    const pan = document.getElementById('pan-slider').value;
-    const tilt = document.getElementById('tilt-slider').value;
-    const roll = document.getElementById('roll-slider').value;
-    const packet = new RawTextPacket(`${pan},${tilt},${roll}`);
-    sendPacket(packet);
-}
+    async updateServoControl() {
+        const pan = document.getElementById('pan-slider').value;
+        const tilt = document.getElementById('tilt-slider').value;
+        const roll = document.getElementById('roll-slider').value;
+        const packet = new RawTextPacket(`${pan},${tilt},${roll}`);
+        await this.sendPacket(packet);
+    }
 
-function centerServos() {
-    document.getElementById('pan-slider').value = 90;
-    document.getElementById('tilt-slider').value = 90;
-    document.getElementById('roll-slider').value = 90;
-    updateServoControl();
-}
+    async centerServos() {
+        document.getElementById('pan-slider').value = 90;
+        document.getElementById('tilt-slider').value = 90;
+        document.getElementById('roll-slider').value = 90;
+        await this.updateServoControl();
+    }
 
     async sendControlCommand(command) {
         const controlCommandPacket = new ControlCommandPacket(command, 0x01);

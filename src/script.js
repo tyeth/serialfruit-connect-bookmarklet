@@ -634,7 +634,7 @@ class SerialFruit {
 
             // check if Serial panel is connected
             console.warn('Code.CircuitPython.Org support not implemented yet - try using webserial.io or the device web workflow page (at device IP or circuitpython.local)');
-        ensureEverythingHooked();
+            window.serialfruit.ensureEverythingHooked();
         } else if (window.location.host.match(/webserial.io/i)) {
             if (window.location.queryParams && !window.location.queryParams.vid) {
                 console.error('WebSerial.io: No vid query parameter found - visit page first with a device selected');

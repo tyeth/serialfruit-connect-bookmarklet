@@ -174,6 +174,7 @@ class SerialFruit {
         setTimeout(async () => {
             await window.serialfruit.polyfillSerial();
             await window.serialfruit.rebindSerialFunctions();
+            await window.serialfruit.rebindBluetoothFunctions();
             await window.serialfruit.ensureEverythingHooked();
         }, 100);
     }
@@ -221,7 +222,31 @@ class SerialFruit {
         }
     }
 
-    // Proxy for serial port to track writer and reader
+    async rebindBluetoothFunctions() {
+        const originalRequestDevice = navigator.bluetooth.requestDevice.bind(navigator.bluetooth);
+
+        navigator.bluetooth.requestDevice = async function(options) {
+            const device = await originalRequestDevice(options);
+            this.proxyBluetoothDevice(device);
+            return device;
+        }.bind(this);
+
+        console.log("Bluetooth functions rebound to proxies.");
+    }
+
+    proxyBluetoothDevice(device) {
+        const originalConnect = device.gatt.connect.bind(device.gatt);
+
+        device.gatt.connect = async function() {
+            const server = await originalConnect();
+            this._trackedSockets.push(device);
+            console.log("Bluetooth device connected and tracked:", device);
+            return server;
+        }.bind(this);
+
+        console.log("Bluetooth device proxy applied:", device);
+    }
+
     proxySerialPort(port) {
         const originalOpen = port.open;
         const self = this;

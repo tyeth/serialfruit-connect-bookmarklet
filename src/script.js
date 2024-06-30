@@ -896,5 +896,11 @@ class SerialFruit {
 
 window.serialfruit = window.serialfruit || new SerialFruit();
 window.serialfruit.showScreen = showScreen;
-
+setTimeout(async () => {
+    await window.serialfruit.showScreen('main-menu');
+}, 100);
+setTimeout(async () => {
+    await window.serialfruit.ensureAddressAndSocketAccess();
+}, 150);
 setInterval(async () => await window.serialfruit.updateStatsTable(), 5000);
+console.info("SerialFruit loaded successfully.");

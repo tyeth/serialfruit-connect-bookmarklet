@@ -193,7 +193,7 @@ class SerialFruit {
     // Polyfill for mobile compatibility
     async polyfillSerial() {
         if (!('serial' in navigator)) {
-            const { SerialPort } = await import('https://unpkg.com/web-serial-polyfill@0.5.0/dist/index.min.js');
+            const { SerialPort } = await import('https://unpkg.com/web-serial-polyfill@1.0.15/dist/serial.js');
             window.navigator.serial = new SerialPort();
             console.log("Web Serial API polyfilled for compatibility.");
         }

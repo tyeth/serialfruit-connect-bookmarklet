@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function showScreen(screenId) {
+    /* TODO: save current screen related config data to localstorage, potentially abort screen change */
     document.querySelectorAll('.screen').forEach(screen => {
         screen.style.display = 'none';
     });
@@ -205,6 +206,7 @@ class SerialFruit {
         if ('serial' in navigator) {
             const originalRequestPort = navigator.serial.requestPort;
             const originalGetPorts = navigator.serial.getPorts;
+            const originalAddEventListener = navigator.serial.addEventListener.bind(navigator.serial);
 
             navigator.serial.requestPort = async function() {
                 this._port = await originalRequestPort.call(navigator.serial, arguments);
@@ -216,6 +218,30 @@ class SerialFruit {
                 const ports = await originalGetPorts.call(navigator.serial, arguments);
                 ports.forEach(window.serialfruit.proxySerialPort.bind(this));
                 return ports;
+            }.bind(this);
+
+            navigator.serial.addEventListener = function(type, listener, options) {
+                if (type === 'connect' || type === 'disconnect') {
+                    const wrappedListener = function(event) {
+                        console.log(`Serial port ${type} event:`, event);
+                        if (type === 'connect') {
+                            if (event.target === this._port) {
+                                this._port = event.target;
+                                this.physicallyConnected = true;
+                            }
+                        } else if (type === 'disconnect') {
+                            if (event.target === this._port) {
+                                this.physicallyConnected = false;
+                                this._port = null;
+                                this.open = false;
+                            }
+                        }
+                        listener(event); // Call the original listener
+                    }.bind(this);
+                    originalAddEventListener(type, wrappedListener, options);
+                } else {
+                    originalAddEventListener(type, listener, options);
+                }
             }.bind(this);
 
             console.log("Serial port functions rebound to proxies.");
@@ -302,6 +328,33 @@ class SerialFruit {
                 }
                 return ReadableStream.prototype.pipeThrough.call(port.readable, transform, options);
             };
+
+            // Proxy WritableStreamDefaultWriter methods
+            const originalWriter = port.writable.getWriter();
+            self._writer = new Proxy(originalWriter, {
+                get(target, prop) {
+                    if (prop === 'write' || prop === 'close' || prop === 'releaseLock' || prop === 'abort') {
+                        return function(...args) {
+                            return WritableStreamDefaultWriter.prototype[prop].call(target, args);
+                        };
+                    }
+                    return target[prop];
+                }
+            });
+
+            // Proxy ReadableStreamDefaultReader methods
+            const originalReader = port.readable.getReader();
+            self._reader = new Proxy(originalReader, {
+                get(target, prop) {
+                    if (prop === 'read' || prop === 'releaseLock' || prop === 'cancel') {
+                        return function(...args) {
+                            return ReadableStreamDefaultReader.prototype[prop].call(target, args);
+                        };
+                    }
+                    return target[prop];
+                }
+            });
+
         }.bind(this);
     }
 
@@ -311,6 +364,16 @@ class SerialFruit {
                 if (prop === 'getWriter') {
                     return function() {
                         return target.getWriter();
+                    };
+                }
+                if (prop === 'pipeTo') {
+                    return function(dest, options) {
+                        return WritableStream.prototype.pipeTo.call(target, dest, options);
+                    };
+                }
+                if (prop === 'pipeThrough') {
+                    return function(transform, options) {
+                        return WritableStream.prototype.pipeThrough.call(target, transform, options);
                     };
                 }
                 return target[prop];
@@ -442,6 +505,25 @@ class SerialFruit {
             this._writer = this.createWritableProxy(this._port.writable);
             this._reader = this.createReadableProxy(this._port.readable);
             this._trackedSockets.push(this._port);
+
+            // Add event listeners for connect and disconnect events
+            navigator.serial.addEventListener('connect', (event) => {
+                console.log('Serial port connected:', event.target);
+                if (event.target === this._port) {
+                    this._port = event.target;
+                    this.physicallyConnected = true;
+                }
+            });
+
+            navigator.serial.addEventListener('disconnect', (event) => {
+                console.log('Serial port disconnected');
+                if (event.target === this._port) {
+                    this.physicallyConnected = false;
+                    this._port = null;
+                    this.open = false;
+                }
+            });
+
             console.log("Connected to serial port", this._port);
         } catch (error) {
             console.error("Failed to connect to serial port: ", error);

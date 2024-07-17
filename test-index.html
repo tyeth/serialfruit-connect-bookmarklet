@@ -1,39 +1,40 @@
-<html>
-
+<!doctype html>
+<html lang="en">
 <head>
+    <meta charset="utf-8">
+    <title>test site to mess with css and events</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="test-index.css">
     <script src="test-index.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             let newDiv = window.document.createElement('div');
             newDiv.innerHTML = 'Hello, Script in-page DOMContentLoaded World!';
             window.document.body.appendChild(newDiv);
         });
 
 
-        document.addEventListener('onload', function() {
+        document.addEventListener('onload', function () {
             let newDiv = window.document.createElement('div');
             newDiv.innerHTML = 'Hello, Script in-page onLOAD World!';
             window.document.body.appendChild(newDiv);
         });
 
-        document.addEventListener('onready', function() {
+        document.addEventListener('onready', function () {
             let newDiv = window.document.createElement('div');
             newDiv.innerHTML = 'Hello, Script in-page onREADY World!';
             window.document.body.appendChild(newDiv);
         });
 
-        document.addEventListener('readystatechange', function(event) {
+        document.addEventListener('readystatechange', function (event) {
             console.log('document.readyState:', document.readyState);
             console.log('event:', event);
             let newDiv = window.document.createElement('div');
-            newDiv.innerHTML = 'Hello, Script in-page readystatechange='+ document.readyState +' World!';
+            newDiv.innerHTML = 'Hello, Script in-page readystatechange=' + document.readyState + ' World!';
             window.document.body.appendChild(newDiv);
         });
     </script>
 </head>
-
-</html>
 
 <body>
     <h1>Test Page with no real content</h1>

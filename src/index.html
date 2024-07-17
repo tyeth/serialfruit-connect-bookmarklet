@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bluefruit Web Serial</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/tyeth/serialfruit-connect@v0.0.99/src/style.css">
+    <!-- TODO: this site list nicely breaks the css:
+      https://webhint.io/docs/user-guide/hints/hint-meta-viewport/
+      
+      -->
 </head>
 <body class="serialfruit-body">
     <div id="main-menu" class="screen">
@@ -231,7 +235,7 @@
         <button onclick="window.serialfruit.showScreen('neopixel')">Back to Neopixel page</button>
         <hr />
         <labl for="neopixelStrandSize">Choose a strand size:</label>
-        <input type="range" id="neopixelStrandSize" title="Strand size selection" min="1" max="65535" step="1">
+        <input type="number" id="neopixelStrandSize" title="Strand size selection" min="1" max="65535" step="1" value="8">
         <hr />
         <input type="text" id="neopixelStrandInput" placeholder="Enter Neopixel Strand Configuration data">
         <!-- instruct user on data format in tooltip to represent the strand options for setup - we'll do colour and brightness later, json-like -->
@@ -292,7 +296,7 @@
         <canvas id="neopixelShapeCanvas" width="250" height="250"></canvas>
         <!-- drawing pen tools - matrix (+specify type?) or strand (pixel is strand size 1) -->
         <label for="neopixelShapeStrand">Create a Neopixel Strand (polyline) of pixel length:</label>
-        <input type="range" id="neopixelShapeStrand" title="Strand size selection" min="1" max="65535" step="1">
+        <input type="number" id="neopixelShapeStrand" title="Strand size selection" min="1" max="65535" step="1" value="16">
         <button onclick="window.serialfruit.createNeopixelStrand()">set drawing tool to Create Strand</button>
         <label for="neopixelShapeMatrix">Create a Neopixel Matrix (polyline) of pixel size:</label>
         <input type="range" id="neopixelShapeMatrixWidth" title="Matrix width selection" min="1" max="65535" step="1">

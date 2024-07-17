@@ -28,6 +28,11 @@
     color: #000;
 }
 
+#serialfruit-body div.form-group {
+    /* add a newline after labels */
+    display: inline-block;
+}
+
 #serialfruit-body button {
     color: #000;
 }

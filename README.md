@@ -156,3 +156,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - [Adafruit Bluefruit Connect](https://learn.adafruit.com/bluefruit-le-connect)
 - [Web Serial API](https://developer.mozilla.org/en-US/docs/Web/API/Serial)
+This project is tested with BrowserStack.
